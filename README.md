@@ -1,7 +1,7 @@
 # mtgdeckbuild
 A Magic: The Gathering format archetype deck building tool based on TOP 8 tournaments results.
 
-# MTGRank
+# MTGDeckBuild
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)  
 ---  
 A Magic: The Gathering format archetype deck building tool based on TOP 8 tournaments results. Building is based on currently played archetypes and most used cards in tournaments decks. Generally, the last 25 decks are used.
