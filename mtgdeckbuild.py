@@ -205,7 +205,7 @@ if __name__ == '__main__':
                     if print_with_details:
                         print(f'{card[1][2]}x {card[0]} - used in {card[1][1]}/{n-1} decks')
                     else:
-                        print(f'{card[1][2]}x {card[0]}')
+                        print(f'{card[1][2]} {card[0]}')
         print(f'TOTAL x{main_total_cards} + x{side_total_cards}')
     else:
         # Main deck
@@ -315,11 +315,11 @@ if __name__ == '__main__':
                         if print_with_details:
                             print(f'{card[1][2]}x {card[0]} - used in {card[1][1]}/{n-1} decks')
                         else:
-                            print(f'{card[1][2]}x {card[0]}')
+                            print(f'{card[1][2]} {card[0]}')
                 else:
                     if card[1][1] >= min_decks_side:
                         if print_with_details:
                             print(f'{card[1][2]}x {card[0]} - used in {card[1][1]}/{n-1} decks')
                         else:
-                            print(f'{card[1][2]}x {card[0]}')
+                            print(f'{card[1][2]} {card[0]}')
         print(f'\nTotal of {main_total_cards} cards in main deck and {side_total_cards} in sideboard\n')
