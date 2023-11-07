@@ -54,7 +54,7 @@ if __name__ == '__main__':
         if href:
             if href.startswith('/format?f='):
                 mtg_formats[n] = href.split('=')[1]
-                format_choice_str += f'{n} - {link.text.capitalize()}\n'
+                format_choice_str += f'{n} - {link.text.title()}\n'
                 n += 1
 
     # Format choice
