@@ -33,18 +33,34 @@ if __name__ == '__main__':
     args = vars(parser.parse_args())
     print_with_details = args['details']
     min_decks = args['minimum_number_of_decks']
+    if min_decks:
+        if min_decks < 1:
+            print('Minimum number of decks must be positive.')
+            exit()
     competitive = args['competitive_only']
 
+    mtgtop8_baseurl = 'https://mtgtop8.com'
+    user_agent = {'User-agent': 'Mozilla/5.0'}
+
+    # Format discovery
+    format_choice_str = 'Select a format:\n'
+    mtg_formats = {}
+    response = get(f'{mtgtop8_baseurl}', headers=user_agent)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    links = soup.find_all('a')
+    n = 1
+    for link in links:
+        href = link.get('href')
+        if href:
+            if href.startswith('/format?f='):
+                mtg_formats[n] = href.split('=')[1]
+                format_choice_str += f'{n} - {link.text.capitalize()}\n'
+                n += 1
 
     # Format choice
-    formats = {1: 'LE', 2: 'MO', 3: 'EDH', 4: 'PI'}
     format_choice = 0
     while format_choice == 0:
-        format_choice = Prompt.ask('Select a format:\n\
-        1 Legacy\n\
-        2 Modern\n\
-        3 Duel Commander\n\
-        4 Pioneer\n', choices=['1', '2', '3', '4'])
+        format_choice = Prompt.ask(format_choice_str, choices=[f'{n}' for n in mtg_formats.keys()])
         try:
             format_choice = int(format_choice)
             if format_choice == 0:
@@ -52,14 +68,11 @@ if __name__ == '__main__':
         except:
             print('Invalid choice.')
     
-    mtg_format = formats[format_choice]
-
+    mtg_format = mtg_formats[format_choice]
 
     # Archetypes discovery
     archetypes_list = []
-
-    user_agent = {'User-agent': 'Mozilla/5.0'}
-    response = get(f'https://mtgtop8.com/format?f={mtg_format}', headers = user_agent)
+    response = get(f'{mtgtop8_baseurl}/format?f={mtg_format}', headers = user_agent)
 
     # Parse the HTML content
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -80,15 +93,15 @@ if __name__ == '__main__':
     # Archetypes choice
     archetypes_dict = {}
     archetype_choice_str = f'Select an archetype:\n'
-    cpt = 0
+    n = 0
     for a in archetypes_list:
-        archetypes_dict[f'{cpt}'] = a[1]
-        archetype_choice_str += f'{cpt+1} {a[1]}\n'
-        cpt += 1
+        archetypes_dict[n] = a[1]
+        archetype_choice_str += f'{n+1} - {a[1]}\n'
+        n += 1
 
     archetype_choice = 0
     while archetype_choice == 0:
-        archetype_choice = Prompt.ask(archetype_choice_str, choices=list(archetypes_dict.keys()))
+        archetype_choice = Prompt.ask(archetype_choice_str, choices=[f'{n+1}' for n in archetypes_dict.keys()])
         try:
             archetype_choice = int(archetype_choice) - 1
             if archetype_choice == 0:
@@ -98,12 +111,11 @@ if __name__ == '__main__':
 
     mtg_archetype = archetypes_list[archetype_choice][0]
 
-
     # Deck search
     deck_search_str = f'current_page=&format={mtg_format}&archetype_sel%5B{mtg_format}%5D={mtg_archetype}'
     if competitive:
         deck_search_str += f'&compet_check%5BP%5D=1&compet_check%5BM%5D=1&compet_check%5BC%5D=1'
-    response = post('https://mtgtop8.com/search', data=deck_search_str, headers={'referer': 'http://mtgtop8.com/search', 'Content-Type': 'application/x-www-form-urlencoded'})
+    response = post(f'{mtgtop8_baseurl}/search', data=deck_search_str, headers={'referer': f'{mtgtop8_baseurl}/search', 'Content-Type': 'application/x-www-form-urlencoded'})
     compare_str = 'checkall=1'
 
     # Parse the HTML content
@@ -123,7 +135,8 @@ if __name__ == '__main__':
 
 
     # Deck comparison
-    response = post('https://mtgtop8.com/compare', data = compare_str, headers={'referer': 'http://mtgtop8.com/search', 'Content-Type': 'application/x-www-form-urlencoded'})
+    response = post(f'{mtgtop8_baseurl}/compare', data = compare_str, headers={'referer': f'{mtgtop8_baseurl}/search', 'Content-Type': 'application/x-www-form-urlencoded'})
+
     soup = BeautifulSoup(response.text, 'html.parser')
     cards = {}
     table = soup.find_all('table')[-1]
@@ -176,7 +189,7 @@ if __name__ == '__main__':
     side_total_cards = 0
     main_target = 60
     side_target = 15
-    if format == 'DC': # Adapt fromat's target number of cards for DC
+    if 'EDH' in mtg_format: # Adapt fromat's target number of cards for DC
         main_target = 99
         side_target = 2     
     # If the minimum number of decks using each card is provided, use it, else automatically adjust the result to match the format number of cards (except for DC)
@@ -206,7 +219,7 @@ if __name__ == '__main__':
                         print(f'{card[1][2]}x {card[0]} - used in {card[1][1]}/{n-1} decks')
                     else:
                         print(f'{card[1][2]} {card[0]}')
-        print(f'TOTAL x{main_total_cards} + x{side_total_cards}')
+        print(f'Total of {main_total_cards} cards in main deck and {side_total_cards} in sideboard')
     else:
         # Main deck
         min_decks_main = 12
