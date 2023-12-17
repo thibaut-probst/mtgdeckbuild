@@ -363,7 +363,8 @@ if __name__ == '__main__':
             if commanders.count(commander) == len(decks.keys()):
                 fixed_commander = commander
         commanders = set(commanders) # Turn it into a set to keep only unique values
-        commanders.remove(fixed_commander)
+        if fixed_commander:
+            commanders.remove(fixed_commander)
         commanders_dict = {}
         n = 0
         for commander in commanders:
@@ -400,6 +401,10 @@ if __name__ == '__main__':
                 if commander_present_in_side:
                     filtered_decks[deck] = decks[deck]
             decks = filtered_decks
+
+    if not decks:
+        print('No matching decks found')
+        exit()
 
     # Determine number of decks using each card and average number of cards in using decks
     main_avg_card_counts = {}
