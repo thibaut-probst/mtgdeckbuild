@@ -2,18 +2,20 @@
 A Magic: The Gathering format archetype deck building tool based on TOP 8 tournaments results.
 
 # MTGDeckBuild
-![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue)  
+![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)  
 ---  
-A Magic: The Gathering format archetype deck building tool based on TOP 8 tournaments results. Deck building is based on currently played archetypes and most used cards in tournaments decks. Generally, the last 25 decks are used. A proposal with a number of cards as close as possible to the format target number of cards is then proposed.
+A Magic: The Gathering format archetype average deck building tool based on TOP 8 tournaments results. Deck building is based on currently played archetypes and most used cards in tournaments decks. Generally, the last 25 decks are used but some filter may affect the number of analyzed decks.
 
 ## Features
 
 * Support of [MTGTOP8](https://mtgtop8.com) as tournament data source.
 * Support of all formats with automatic discovery.
-* Support of autodiscovery of archetypes.
-* Support of simple or detailed printing of the decklist.
-* Support of automatic adjustment of minimum number of decks using each card to generate a decklist closer to format's target number of card in main deck and sideboard. The decklist number of card will be as closed as possible to the format's target while considering the average playset value of each card.
-* Support of manual submission of the minimum number of decks using each card to generate a decklist accordingly. The decklist number of cards will depend on this parameter while considering the average playset value of each card.
+* Support of all archetypes with automatic discovery.
+* Support of a filter to only consider competitive decks.
+* Support of a filter to only consider decks including given names.
+* Support of a filter to only consider decks over the last given months.
+* Support of an interactive mode when executing the script.
+* Support of simple or detailed printing of the average decklist.
 
 ## Requirements
 
@@ -37,15 +39,16 @@ You can display ***MTGDeckBuild*** startup parameters information by using the -
 
 ```
 $ python3 mtgdeckbuild.py -h
-usage: mtgdeckbuild.py [-h] [--details] [--minimum-number-of-decks MINIMUM_NUMBER_OF_DECKS] [--competitive-only]
+usage: mtgdeckbuild.py [-h] [--details] [--competitive-only] [--name NAME] [--last-months LAST_MONTHS]
 
 options:
   -h, --help            show this help message and exit
   --details, -d         Print deck with details: sections and number of decks using each card
-  --minimum-number-of-decks MINIMUM_NUMBER_OF_DECKS, -m MINIMUM_NUMBER_OF_DECKS
-                        Minimum number of decks playing each card (default: automatically adjust the result to match the deck format's number of cards)
   --competitive-only, -c
                         Only consider competitive decks
+  --name NAME, -n NAME  Only consider decks including given deck name
+  --last-months LAST_MONTHS, -l LAST_MONTHS
+                        Only consider decks from the last given months
 ```
 
 ## Examples
@@ -56,7 +59,7 @@ Select a format:
 2 - Block
 3 - Extended
 4 - Highlander
-5 - Canadian highlander
+5 - Canadian Highlander
 6 - Explorer
 7 - Historic
 8 - Alchemy
@@ -66,10 +69,10 @@ Select a format:
 12 - Legacy
 13 - Vintage
 14 - Pauper
-15 - Cedh
-16 - Duel commander
+15 - cEDH
+16 - Duel Commander
 17 - Premodern
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17]: 12
+: 12
 Select an archetype:
 1 - 4/5c Control
 2 - Affinity
@@ -80,96 +83,96 @@ Select an archetype:
 7 - Artifacts Prison
 8 - BUG Control
 9 - BUG Midrange
-10 - Bant Control
-11 - Belcher
-12 - Bomberman
-13 - Burn
-14 - Canadian Threshold
-15 - Cascade Crash
-16 - Cephalid Breakfast
-17 - Cloudpost Ramp
-18 - Dark Depths
-19 - Deadguy Ale
-20 - Death & Taxes
-21 - Death's Shadow
-22 - Delver (Other)
-23 - Dimir Aggro
-24 - Doomsday
-25 - Dragon Stompy
-26 - Dredge
-27 - Eldrazi Aggro
-28 - Elves
-29 - Enchantress
-30 - Esper Aggro
-31 - Esper Vial
-32 - Food Griffin
-33 - Goblins
-34 - Grixis Aggro
-35 - Grixis Control
-36 - Hammer Time
-37 - High Tide
-38 - Hive Mind
-39 - Hogaak
-40 - Hollow One Madness
-41 - Infect
-42 - Initiative Stompy
-43 - Jund
-44 - Lands
-45 - Landstill
-46 - Loam
-47 - Maverick
-48 - Merfolk
-49 - Mississippi River
-50 - Mono Black Aggro
-51 - Mono Black Combo
-52 - Mono Red Combo
-53 - Mystic Forge
-54 - Nic Fit 
-55 - Ninja
-56 - Other - Aggro
-57 - Other - Combo
-58 - Other - Control
-59 - Painter
-60 - Patriot Aggro
-61 - Pox
-62 - Reanimator
-63 - Show and Tell
-64 - Slivers
-65 - Stiflenought
-66 - Stoneblade
-67 - Storm
-68 - The Rock (Junk)
-69 - UR Aggro
-70 - UWx Control
-71 - Zoo
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61
-/62/63/64/65/66/67/68/69/70/71]: 13
+10 - Bant Aggro
+11 - Bant Control
+12 - Belcher
+13 - Bomberman
+14 - Burn
+15 - Canadian Threshold
+16 - Cascade Crash
+17 - Cephalid Breakfast
+18 - Cloudpost Ramp
+19 - Curses
+20 - Dark Depths
+21 - Deadguy Ale
+22 - Death & Taxes
+23 - Death's Shadow
+24 - Delver (Other)
+25 - Dimir Aggro
+26 - Doomsday
+27 - Dragon Stompy
+28 - Dredge
+29 - Eldrazi Aggro
+30 - Elves
+31 - Enchantress
+32 - Esper Aggro
+33 - Food Griffin
+34 - Goblins
+35 - Grixis Aggro
+36 - Grixis Control
+37 - Hammer Time
+38 - High Tide
+39 - Hive Mind
+40 - Hogaak
+41 - Hollow One Madness
+42 - Humans
+43 - Infect
+44 - Initiative Stompy
+45 - Jund
+46 - Lands
+47 - Landstill
+48 - Loam
+49 - Maverick
+50 - Merfolk
+51 - Mississippi River
+52 - Mono Black Aggro
+53 - Mono Black Combo
+54 - Mono Red Combo
+55 - Mystic Forge
+56 - Nic Fit 
+57 - Ninja
+58 - Other - Aggro
+59 - Other - Combo
+60 - Other - Control
+61 - Painter
+62 - Patriot Aggro
+63 - Pox
+64 - Reanimator
+65 - Shoal Infect
+66 - Show and Tell
+67 - Slivers
+68 - Stiflenought
+69 - Stoneblade
+70 - Storm
+71 - The Rock (Junk)
+72 - UR Aggro
+73 - UWx Control
+: 14
 
 
+// MAIN DECK
 12 Mountain
-1 Barbarian Ring
-3 Bloodstained Mire
-3 Wooded Foothills
+3 Arid Mesa
+2 Barbarian Ring
 4 Goblin Guide
 4 Monastery Swiftspear
 4 Eidolon of the Great Revel
 4 Lightning Bolt
 4 Chain Lightning
 4 Fireblast
+4 Lava Spike
 4 Price of Progress
 4 Rift Bolt
-4 Lava Spike
 3 Skewer the Critics
+2 Exquisite Firecraft
 2 Roiling Vortex
-// SIDEBOARDS
-4 Smash to Smithereens
+// SIDEBOARD
+3 Smash to Smithereens
+2 Roiling Vortex
 2 Pyroblast
 2 Ensnaring Bridge
 4 Leyline of the Void
-2 Roiling Vortex
-2 Red Elemental Blast
-
-Total of 60 cards in main deck and 16 in sideboard
+2 Searing Blood
 ```
 ```
 $ python3 mtgdeckbuild.py -d
@@ -178,7 +181,7 @@ Select a format:
 2 - Block
 3 - Extended
 4 - Highlander
-5 - Canadian highlander
+5 - Canadian Highlander
 6 - Explorer
 7 - Historic
 8 - Alchemy
@@ -188,10 +191,10 @@ Select a format:
 12 - Legacy
 13 - Vintage
 14 - Pauper
-15 - Cedh
-16 - Duel commander
+15 - cEDH
+16 - Duel Commander
 17 - Premodern
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17]: 12
+: 12
 Select an archetype:
 1 - 4/5c Control
 2 - Affinity
@@ -202,107 +205,106 @@ Select an archetype:
 7 - Artifacts Prison
 8 - BUG Control
 9 - BUG Midrange
-10 - Bant Control
-11 - Belcher
-12 - Bomberman
-13 - Burn
-14 - Canadian Threshold
-15 - Cascade Crash
-16 - Cephalid Breakfast
-17 - Cloudpost Ramp
-18 - Dark Depths
-19 - Deadguy Ale
-20 - Death & Taxes
-21 - Death's Shadow
-22 - Delver (Other)
-23 - Dimir Aggro
-24 - Doomsday
-25 - Dragon Stompy
-26 - Dredge
-27 - Eldrazi Aggro
-28 - Elves
-29 - Enchantress
-30 - Esper Aggro
-31 - Esper Vial
-32 - Food Griffin
-33 - Goblins
-34 - Grixis Aggro
-35 - Grixis Control
-36 - Hammer Time
-37 - High Tide
-38 - Hive Mind
-39 - Hogaak
-40 - Hollow One Madness
-41 - Infect
-42 - Initiative Stompy
-43 - Jund
-44 - Lands
-45 - Landstill
-46 - Loam
-47 - Maverick
-48 - Merfolk
-49 - Mississippi River
-50 - Mono Black Aggro
-51 - Mono Black Combo
-52 - Mono Red Combo
-53 - Mystic Forge
-54 - Nic Fit 
-55 - Ninja
-56 - Other - Aggro
-57 - Other - Combo
-58 - Other - Control
-59 - Painter
-60 - Patriot Aggro
-61 - Pox
-62 - Reanimator
-63 - Show and Tell
-64 - Slivers
-65 - Stiflenought
-66 - Stoneblade
-67 - Storm
-68 - The Rock (Junk)
-69 - UR Aggro
-70 - UWx Control
-71 - Zoo
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61
-/62/63/64/65/66/67/68/69/70/71]: 13
+10 - Bant Aggro
+11 - Bant Control
+12 - Belcher
+13 - Bomberman
+14 - Burn
+15 - Canadian Threshold
+16 - Cascade Crash
+17 - Cephalid Breakfast
+18 - Cloudpost Ramp
+19 - Curses
+20 - Dark Depths
+21 - Deadguy Ale
+22 - Death & Taxes
+23 - Death's Shadow
+24 - Delver (Other)
+25 - Dimir Aggro
+26 - Doomsday
+27 - Dragon Stompy
+28 - Dredge
+29 - Eldrazi Aggro
+30 - Elves
+31 - Enchantress
+32 - Esper Aggro
+33 - Food Griffin
+34 - Goblins
+35 - Grixis Aggro
+36 - Grixis Control
+37 - Hammer Time
+38 - High Tide
+39 - Hive Mind
+40 - Hogaak
+41 - Hollow One Madness
+42 - Humans
+43 - Infect
+44 - Initiative Stompy
+45 - Jund
+46 - Lands
+47 - Landstill
+48 - Loam
+49 - Maverick
+50 - Merfolk
+51 - Mississippi River
+52 - Mono Black Aggro
+53 - Mono Black Combo
+54 - Mono Red Combo
+55 - Mystic Forge
+56 - Nic Fit 
+57 - Ninja
+58 - Other - Aggro
+59 - Other - Combo
+60 - Other - Control
+61 - Painter
+62 - Patriot Aggro
+63 - Pox
+64 - Reanimator
+65 - Shoal Infect
+66 - Show and Tell
+67 - Slivers
+68 - Stiflenought
+69 - Stoneblade
+70 - Storm
+71 - The Rock (Junk)
+72 - UR Aggro
+73 - UWx Control
+: 14
 
 
-//--------------------------------------------------
-// LANDS x19
-//--------------------------------------------------
-12x Mountain - used in 24/25 decks
-1x Barbarian Ring - used in 12/25 decks
-3x Bloodstained Mire - used in 11/25 decks
-3x Wooded Foothills - used in 10/25 decks
-//--------------------------------------------------
-// CREATURES x12
-//--------------------------------------------------
-4x Goblin Guide - used in 23/25 decks
-4x Monastery Swiftspear - used in 23/25 decks
-4x Eidolon of the Great Revel - used in 21/25 decks
-//--------------------------------------------------
-// OTHER SPELLS x29
-//--------------------------------------------------
-4x Lightning Bolt - used in 25/25 decks
-4x Chain Lightning - used in 23/25 decks
-4x Fireblast - used in 23/25 decks
-4x Price of Progress - used in 23/25 decks
-4x Rift Bolt - used in 23/25 decks
-4x Lava Spike - used in 22/25 decks
-3x Skewer the Critics - used in 19/25 decks
-2x Roiling Vortex - used in 12/25 decks
-//--------------------------------------------------
-// SIDEBOARDS x16
-//--------------------------------------------------
-4x Smash to Smithereens - used in 24/25 decks
-2x Pyroblast - used in 16/25 decks
-2x Ensnaring Bridge - used in 14/25 decks
-4x Leyline of the Void - used in 12/25 decks
-2x Roiling Vortex - used in 10/25 decks
-2x Red Elemental Blast - used in 9/25 decks
-
-Total of 60 cards in main deck and 16 in sideboard
+//----------------------------------------------------------------------
+// LANDS - 17 cards
+//----------------------------------------------------------------------
+12 Mountain - Used by 22/25 decks
+3 Arid Mesa - Used by 10/25 decks
+2 Barbarian Ring - Used by 7/25 decks
+//----------------------------------------------------------------------
+// CREATURES - 12 cards
+//----------------------------------------------------------------------
+4 Goblin Guide - Used by 23/25 decks
+4 Monastery Swiftspear - Used by 23/25 decks
+4 Eidolon of the Great Revel - Used by 21/25 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 31 cards
+//----------------------------------------------------------------------
+4 Lightning Bolt - Used by 25/25 decks
+4 Chain Lightning - Used by 23/25 decks
+4 Fireblast - Used by 23/25 decks
+4 Lava Spike - Used by 23/25 decks
+4 Price of Progress - Used by 23/25 decks
+4 Rift Bolt - Used by 23/25 decks
+3 Skewer the Critics - Used by 18/25 decks
+2 Exquisite Firecraft - Used by 10/25 decks
+2 Roiling Vortex - Used by 9/25 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 15 cards
+//----------------------------------------------------------------------
+4 Leyline of the Void - Used by 12/25 decks
+3 Smash to Smithereens - Used by 23/25 decks
+2 Roiling Vortex - Used by 15/25 decks
+2 Pyroblast - Used by 13/25 decks
+2 Ensnaring Bridge - Used by 12/25 decks
+2 Searing Blood - Used by 8/25 decks
 ```
 ```
 $ python3 mtgdeckbuild.py -c
@@ -311,7 +313,7 @@ Select a format:
 2 - Block
 3 - Extended
 4 - Highlander
-5 - Canadian highlander
+5 - Canadian Highlander
 6 - Explorer
 7 - Historic
 8 - Alchemy
@@ -321,10 +323,10 @@ Select a format:
 12 - Legacy
 13 - Vintage
 14 - Pauper
-15 - Cedh
-16 - Duel commander
+15 - cEDH
+16 - Duel Commander
 17 - Premodern
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17]: 12
+: 12
 Select an archetype:
 1 - 4/5c Control
 2 - Affinity
@@ -335,76 +337,77 @@ Select an archetype:
 7 - Artifacts Prison
 8 - BUG Control
 9 - BUG Midrange
-10 - Bant Control
-11 - Belcher
-12 - Bomberman
-13 - Burn
-14 - Canadian Threshold
-15 - Cascade Crash
-16 - Cephalid Breakfast
-17 - Cloudpost Ramp
-18 - Dark Depths
-19 - Deadguy Ale
-20 - Death & Taxes
-21 - Death's Shadow
-22 - Delver (Other)
-23 - Dimir Aggro
-24 - Doomsday
-25 - Dragon Stompy
-26 - Dredge
-27 - Eldrazi Aggro
-28 - Elves
-29 - Enchantress
-30 - Esper Aggro
-31 - Esper Vial
-32 - Food Griffin
-33 - Goblins
-34 - Grixis Aggro
-35 - Grixis Control
-36 - Hammer Time
-37 - High Tide
-38 - Hive Mind
-39 - Hogaak
-40 - Hollow One Madness
-41 - Infect
-42 - Initiative Stompy
-43 - Jund
-44 - Lands
-45 - Landstill
-46 - Loam
-47 - Maverick
-48 - Merfolk
-49 - Mississippi River
-50 - Mono Black Aggro
-51 - Mono Black Combo
-52 - Mono Red Combo
-53 - Mystic Forge
-54 - Nic Fit 
-55 - Ninja
-56 - Other - Aggro
-57 - Other - Combo
-58 - Other - Control
-59 - Painter
-60 - Patriot Aggro
-61 - Pox
-62 - Reanimator
-63 - Show and Tell
-64 - Slivers
-65 - Stiflenought
-66 - Stoneblade
-67 - Storm
-68 - The Rock (Junk)
-69 - UR Aggro
-70 - UWx Control
-71 - Zoo
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61
-/62/63/64/65/66/67/68/69/70/71]: 13
+10 - Bant Aggro
+11 - Bant Control
+12 - Belcher
+13 - Bomberman
+14 - Burn
+15 - Canadian Threshold
+16 - Cascade Crash
+17 - Cephalid Breakfast
+18 - Cloudpost Ramp
+19 - Curses
+20 - Dark Depths
+21 - Deadguy Ale
+22 - Death & Taxes
+23 - Death's Shadow
+24 - Delver (Other)
+25 - Dimir Aggro
+26 - Doomsday
+27 - Dragon Stompy
+28 - Dredge
+29 - Eldrazi Aggro
+30 - Elves
+31 - Enchantress
+32 - Esper Aggro
+33 - Food Griffin
+34 - Goblins
+35 - Grixis Aggro
+36 - Grixis Control
+37 - Hammer Time
+38 - High Tide
+39 - Hive Mind
+40 - Hogaak
+41 - Hollow One Madness
+42 - Humans
+43 - Infect
+44 - Initiative Stompy
+45 - Jund
+46 - Lands
+47 - Landstill
+48 - Loam
+49 - Maverick
+50 - Merfolk
+51 - Mississippi River
+52 - Mono Black Aggro
+53 - Mono Black Combo
+54 - Mono Red Combo
+55 - Mystic Forge
+56 - Nic Fit 
+57 - Ninja
+58 - Other - Aggro
+59 - Other - Combo
+60 - Other - Control
+61 - Painter
+62 - Patriot Aggro
+63 - Pox
+64 - Reanimator
+65 - Shoal Infect
+66 - Show and Tell
+67 - Slivers
+68 - Stiflenought
+69 - Stoneblade
+70 - Storm
+71 - The Rock (Junk)
+72 - UR Aggro
+73 - UWx Control
+: 14
 
 
-13 Mountain
+// MAIN DECK
+14 Mountain
 3 Arid Mesa
-1 Barbarian Ring
-3 Wooded Foothills
+2 Bloodstained Mire
 4 Monastery Swiftspear
 4 Eidolon of the Great Revel
 4 Goblin Guide
@@ -416,24 +419,22 @@ Select an archetype:
 3 Price of Progress
 4 Skewer the Critics
 2 Roiling Vortex
-// SIDEBOARDS
+// SIDEBOARD
 3 Smash to Smithereens
 2 Pyroblast
 2 Roiling Vortex
 4 Leyline of the Void
 2 Ensnaring Bridge
 2 Red Elemental Blast
-
-Total of 61 cards in main deck and 15 in sideboard
 ```
 ```
-$ python3 mtgdeckbuild.py -m 11 -d -c
+$ python3 mtgdeckbuild.py -d -c
 Select a format:
 1 - Peasant
 2 - Block
 3 - Extended
 4 - Highlander
-5 - Canadian highlander
+5 - Canadian Highlander
 6 - Explorer
 7 - Historic
 8 - Alchemy
@@ -443,274 +444,599 @@ Select a format:
 12 - Legacy
 13 - Vintage
 14 - Pauper
-15 - Cedh
-16 - Duel commander
+15 - cEDH
+16 - Duel Commander
 17 - Premodern
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17]: 16
-Select an archetype:
-1 - Abzan Tempo
-2 - Adeliz, The Cinder Wind
-3 - Aminatou, the Fateshifter
-4 - Animar, Soul of Elements
-5 - Anje Falkenrath
-6 - Aragorn, King Of Gondor
-7 - Aragorn, The Uniter
-8 - Atraxa, Grand Unifier
-9 - Atraxa, Praetors' Voice
-10 - Azusa, Lost But Seeking
-11 - Balmor, Battlemage Captain
-12 - Braids, Cabal Minion
-13 - Dennick, Pious Apprentice
-14 - Elminster
-15 - Ertai Resurrected
-16 - Esika, God Of The Tree
-17 - Golos, Tireless Pilgrim
-18 - Grist, The Hunger Tide
-19 - Gut, True Soul Zealot
-20 - Juri, Master Of The Revue
-21 - Karlov Of The Ghost Council
-22 - Kelsien, the Plague
-23 - Kess, Dissident Mage
-24 - Kroxa, Titan Of Death's Hunger
-25 - Leovold, Emissary of Trest
-26 - Light-Paws, Emperor's Voice
-27 - Magda, Brazen Outlaw
-28 - Marath, Will of the Wild
-29 - Minsc, Beloved Ranger
-30 - Mono Black Control
-31 - Niv-Mizzet Reborn
-32 - Octavia, Living Thesis
-33 - Old Rutstein
-34 - Other - Aggro
-35 - Other - Combo
-36 - Other - Control
-37 - Other Partner Aggro
-38 - Other Partner Combo
-39 - Other Partner Control
-40 - Prossh, Skyraider of Kher
-41 - Raffine, Scheming Seer
-42 - Red Deck Wins
-43 - Sai, Master Thopterist
-44 - Saskia the Unyielding
-45 - Selesnya Aggro
-46 - Slimefoot And Squee
-47 - Soul of Windgrace
-48 - Surrak Dragonclaw
-49 - Sythis, Harvest's Hand
-50 - Teferi, Temporal Archmage
-51 - The Beamtown Bullies
-52 - The Mimeoplasm
-53 - The Ur-Dragon
-54 - Titania, Protector of Argoth
-55 - Tivit, Seller Of Secrets
-56 - Weenie White
-57 - Yoshimaru
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57]: 56
-
-
-Minimum number of decks using each card: 11
-
-//--------------------------------------------------
-LANDS x36
-//--------------------------------------------------
-22x Snow-Covered Plains - used in 24/25 decks
-1x Eiganjo, Seat of the Empire - used in 23/25 decks
-1x Flagstones of Trokair - used in 21/25 decks
-1x Eiganjo Castle - used in 20/25 decks
-1x Mishra's Factory - used in 20/25 decks
-1x Castle Ardenvale - used in 19/25 decks
-1x Mutavault - used in 19/25 decks
-1x Shefet Dunes - used in 19/25 decks
-1x Blinkmoth Nexus - used in 16/25 decks
-1x Rishadan Port - used in 15/25 decks
-1x Tectonic Edge - used in 15/25 decks
-1x Urza's Saga - used in 15/25 decks
-1x Cave of the Frost Dragon - used in 14/25 decks
-1x Ghost Quarter - used in 14/25 decks
-1x War Room - used in 12/25 decks
-//--------------------------------------------------
-CREATURES x43
-//--------------------------------------------------
-1x Mother of Runes - used in 25/25 decks
-1x Thalia, Heretic Cathar - used in 25/25 decks
-1x Thalia, Guardian of Thraben - used in 24/25 decks
-1x Drannith Magistrate - used in 22/25 decks
-1x Giver of Runes - used in 22/25 decks
-1x Lion Sash - used in 22/25 decks
-1x Luminarch Aspirant - used in 22/25 decks
-1x Palace Jailer - used in 22/25 decks
-1x Skyclave Apparition - used in 22/25 decks
-1x Stoneforge Mystic - used in 22/25 decks
-1x Adeline, Resplendent Cathar - used in 21/25 decks
-1x Esper Sentinel - used in 21/25 decks
-1x Leonin Arbiter - used in 21/25 decks
-1x Benevolent Bodyguard - used in 20/25 decks
-1x Cathar Commando - used in 20/25 decks
-1x Giant Killer - used in 20/25 decks
-1x Bounty Agent - used in 19/25 decks
-1x Brimaz, King of Oreskos - used in 19/25 decks
-1x Sanctifier en-Vec - used in 19/25 decks
-1x Selfless Spirit - used in 19/25 decks
-1x Weathered Wayfarer - used in 19/25 decks
-1x Archon of Emeria - used in 18/25 decks
-1x Elite Spellbinder - used in 18/25 decks
-1x Solitude - used in 18/25 decks
-1x Tithe Taker - used in 18/25 decks
-1x White Plume Adventurer - used in 18/25 decks
-1x Recruiter of the Guard - used in 17/25 decks
-1x Phyrexian Revoker - used in 16/25 decks
-1x Ranger-Captain of Eos - used in 16/25 decks
-1x Reidane, God of the Worthy - used in 16/25 decks
-1x Welcoming Vampire - used in 15/25 decks
-1x Kytheon, Hero of Akros - used in 14/25 decks
-1x Seasoned Dungeoneer - used in 14/25 decks
-1x Archivist of Oghma - used in 13/25 decks
-1x Guardian of Faith - used in 13/25 decks
-1x Knight of the White Orchid - used in 13/25 decks
-1x Mirran Crusader - used in 13/25 decks
-1x Grand Abolisher - used in 12/25 decks
-1x Selfless Savior - used in 12/25 decks
-1x Anafenza, Kin-Tree Spirit - used in 11/25 decks
-1x Anointed Peacekeeper - used in 11/25 decks
-1x Sungold Sentinel - used in 11/25 decks
-1x Tomik, Distinguished Advokist - used in 11/25 decks
-//--------------------------------------------------
-OTHER SPELLS x21
-//--------------------------------------------------
-1x Swords to Plowshares - used in 25/25 decks
-1x Umezawa's Jitte - used in 25/25 decks
-1x March of Otherworldly Light - used in 23/25 decks
-1x Council's Judgment - used in 22/25 decks
-1x Mana Tithe - used in 21/25 decks
-1x Parallax Wave - used in 21/25 decks
-1x Portable Hole - used in 21/25 decks
-1x Gideon Blackblade - used in 20/25 decks
-1x On Thin Ice - used in 20/25 decks
-1x Armageddon - used in 19/25 decks
-1x Brave the Elements - used in 19/25 decks
-1x Reverent Mantra - used in 19/25 decks
-1x Flawless Maneuver - used in 18/25 decks
-1x Enlightened Tutor - used in 17/25 decks
-1x Unexpectedly Absent - used in 17/25 decks
-1x Smuggler's Copter - used in 16/25 decks
-1x Skullclamp - used in 15/25 decks
-1x The Wandering Emperor - used in 15/25 decks
-1x Mox Amber - used in 14/25 decks
-1x Fateful Absence - used in 13/25 decks
-1x Sword of Fire and Ice - used in 12/25 decks
-//--------------------------------------------------
-SIDEBOARDS x1
-//--------------------------------------------------
-1x Isamaru, Hound of Konda - used in 16/25 decks
-Total of 100 cards in main deck and 1 in sideboard
-```
-```
-$ python3 mtgdeckbuild.py -m 11 -c
-Select a format:
-1 - Peasant
-2 - Block
-3 - Extended
-4 - Highlander
-5 - Canadian highlander
-6 - Explorer
-7 - Historic
-8 - Alchemy
-9 - Standard
-10 - Pioneer
-11 - Modern
-12 - Legacy
-13 - Vintage
-14 - Pauper
-15 - Cedh
-16 - Duel commander
-17 - Premodern
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17]: 11
+: 11
 Select an archetype:
 1 - 4/5c Aggro
 2 - 4c Control
-3 - Ad Nauseam
-4 - Affinity
-5 - Amulet Titan
-6 - Bant Control
-7 - Big Red
-8 - Breach
-9 - Calibrated Blast
-10 - Cascade Beanstalk
-11 - Cascade Crash
-12 - Creativity
-13 - Creatures Toolbox
-14 - Death And Taxes
-15 - Death's Shadow
-16 - Elementals
-17 - Esper Control
-18 - Grixis Control
-19 - Hammer Time
-20 - Hardened Scales
-21 - Heliod Life
-22 - Humans
-23 - Infect
-24 - Instant Reanimator
-25 - Jeskai Control
-26 - Jund
-27 - Landless
-28 - Living End
-29 - Martyr Life
-30 - Merfolk
-31 - Mono Black Control
-32 - Orzhov Midrange
-33 - Other - Aggro
-34 - Other - Combo
-35 - Rakdos Aggro
-36 - Reanimator
-37 - Red Deck Wins
-38 - Scapeshift
-39 - Temur Aggro
-40 - The One Ring Control
-41 - The Rock
-42 - The Underworld Cookbook
-43 - Tooth and Nail
-44 - UB Mill
-45 - UR Aggro
-46 - UR Control
-47 - Urza
-48 - UrzaTron
-49 - Valakut
- [1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49]: 44
+3 - Affinity
+4 - Amulet Titan
+5 - Boros Aggro
+6 - Calibrated Blast
+7 - Cascade Beanstalk
+8 - Cascade Crash
+9 - CopyCat
+10 - Creativity
+11 - Creatures Toolbox
+12 - Death And Taxes
+13 - Death's Shadow
+14 - Dredge
+15 - Eldrazi Aggro
+16 - Enchantress
+17 - Faeries
+18 - Glimpse of Tomorrow
+19 - Goblins
+20 - Grixis Control
+21 - Gruul Aggro
+22 - Gruul Utopia
+23 - Hammer Time
+24 - Hardened Scales
+25 - Heliod Life
+26 - Humans
+27 - Instant Reanimator
+28 - Jeskai Aggro
+29 - Jund
+30 - Living End
+31 - Martyr Life
+32 - Merfolk
+33 - Mono Black Control
+34 - Orzhov Midrange
+35 - Other - Aggro
+36 - Other - Combo
+37 - Other - Control
+38 - Rakdos Aggro
+39 - Red Deck Wins
+40 - Scapeshift
+41 - Smallpox
+42 - Tameshi Bloom
+43 - Teaching Control
+44 - Temur Aggro
+45 - The One Ring Control
+46 - The Rock
+47 - The Underworld Cookbook
+48 - UB Mill
+49 - UR Aggro
+50 - UR Control
+51 - UW Control
+52 - UrzaTron
+: 48
 
 
-Minimum number of decks using each card: 11
+//----------------------------------------------------------------------
+// LANDS - 23 cards
+//----------------------------------------------------------------------
+4 Field of Ruin - Used by 25/25 decks
+4 Polluted Delta - Used by 24/25 decks
+3 Island - Used by 25/25 decks
+2 Watery Grave - Used by 24/25 decks
+2 Shelldock Isle - Used by 22/25 decks
+2 Scalding Tarn - Used by 19/25 decks
+2 Flooded Strand - Used by 12/25 decks
+1 Oboro, Palace in the Clouds - Used by 25/25 decks
+1 Otawara, Soaring City - Used by 24/25 decks
+1 Swamp - Used by 23/25 decks
+1 Mikokoro, Center of the Sea - Used by 13/25 decks
+//----------------------------------------------------------------------
+// CREATURES - 8 cards
+//----------------------------------------------------------------------
+4 Hedron Crab - Used by 25/25 decks
+4 Ruin Crab - Used by 25/25 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 29 cards
+//----------------------------------------------------------------------
+4 Archive Trap - Used by 25/25 decks
+4 Fractured Sanity - Used by 25/25 decks
+4 Drown in the Loch - Used by 23/25 decks
+4 Fatal Push - Used by 23/25 decks
+3 Visions of Beyond - Used by 24/25 decks
+3 Tasha's Hideous Laughter - Used by 23/25 decks
+3 Surgical Extraction - Used by 21/25 decks
+2 Jace, the Perfected Mind - Used by 25/25 decks
+1 Baleful Mastery - Used by 15/25 decks
+1 Murderous Cut - Used by 14/25 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 15 cards
+//----------------------------------------------------------------------
+2 Ensnaring Bridge - Used by 22/25 decks
+2 Extirpate - Used by 21/25 decks
+2 Engineered Explosives - Used by 17/25 decks
+2 Soul-Guide Lantern - Used by 17/25 decks
+2 Ghost Quarter - Used by 9/25 decks
+1 Crypt Incursion - Used by 22/25 decks
+1 Eliminate - Used by 9/25 decks
+1 Go for the Throat - Used by 9/25 decks
+1 Echoing Truth - Used by 6/25 decks
+1 Leyline of the Void - Used by 6/25 decks
+```
+```
+$ python3 mtgdeckbuild.py -d -c
+Select a format:
+1 - Peasant
+2 - Block
+3 - Extended
+4 - Highlander
+5 - Canadian Highlander
+6 - Explorer
+7 - Historic
+8 - Alchemy
+9 - Standard
+10 - Pioneer
+11 - Modern
+12 - Legacy
+13 - Vintage
+14 - Pauper
+15 - cEDH
+16 - Duel Commander
+17 - Premodern
+: 16
+Select an archetype:
+1 - Aminatou, the Fateshifter
+2 - Animar, Soul of Elements
+3 - Aragorn, King Of Gondor
+4 - Aragorn, The Uniter
+5 - Arwen, Mortal Queen
+6 - Atraxa, Grand Unifier
+7 - Atraxa, Praetors' Voice
+8 - Azusa, Lost But Seeking
+9 - Balmor, Battlemage Captain
+10 - Dennick, Pious Apprentice
+11 - Elminster
+12 - Emmara, Soul Of The Accord
+13 - Ertai Resurrected
+14 - Ghyrson Starn, Kelermorph
+15 - Golos, Tireless Pilgrim
+16 - Greasefang, Okiba Boss
+17 - Grenzo, Dungeon Warden
+18 - Grist, The Hunger Tide
+19 - Gut, True Soul Zealot
+20 - Indoraptor, the Perfect Hybrid
+21 - Jirina Kudro
+22 - Judith, the Scourge Diva
+23 - Juri, Master Of The Revue
+24 - Kelsien, the Plague
+25 - Kess, Dissident Mage
+26 - Kinnan, Bonder Prodigy
+27 - Klothys, God Of Destiny
+28 - Kroxa, Titan Of Death's Hunger
+29 - Kyodai, Soul Of Kamigawa
+30 - Leovold, Emissary of Trest
+31 - Light-Paws, Emperor's Voice
+32 - Maelstrom Wanderer
+33 - Marath, Will of the Wild
+34 - Migloz, Maze Crusher
+35 - Minsc, Beloved Ranger
+36 - Mono Black Control
+37 - Narset, Enlightened Master
+38 - Niv-Mizzet Reborn
+39 - Niv-Mizzet, Parun
+40 - Octavia, Living Thesis
+41 - Old Rutstein
+42 - Old Stickfingers
+43 - Other - Aggro
+44 - Other - Combo
+45 - Other - Control
+46 - Other Partner Aggro
+47 - Other Partner Combo
+48 - Other Partner Control
+49 - Prossh, Skyraider of Kher
+50 - Queen Marchesa
+51 - Raffine, Scheming Seer
+52 - Red Deck Wins
+53 - Slimefoot And Squee
+54 - Soul of Windgrace
+55 - Sygg, River Cutthroat
+56 - Sythis, Harvest's Hand
+57 - Teferi, Temporal Archmage
+58 - The Beamtown Bullies
+59 - The Gitrog Monster
+60 - The Ur-Dragon
+61 - Tivit, Seller Of Secrets
+62 - Weenie White
+63 - Will 11
+64 - Yoshimaru
+: 62
+Different commanders are used in analyzed decks. Select those you want to keep. If you want to select multiple commanders, use comma-separated choices (e.g. "1, 2")
+1 - Ratchet, Field Medic
+2 - Kytheon, Hero of Akros
+3 - Skrelv, Defector Mite
+4 - Adeline, Resplendent Cathar
+5 - Isamaru, Hound of Konda
+: 2, 3, 4, 5
 
-4 Field of Ruin
-1 Oboro, Palace in the Clouds
-3 Island
-4 Polluted Delta
-2 Watery Grave
-1 Otawara, Soaring City
-1 Swamp
-2 Shelldock Isle
-2 Scalding Tarn
-1 Mikokoro, Center of the Sea
-4 Hedron Crab
-4 Ruin Crab
-4 Archive Trap
-4 Fractured Sanity
-2 Jace, the Perfected Mind
-4 Drown in the Loch
-4 Fatal Push
-4 Tasha's Hideous Laughter
-3 Visions of Beyond
-3 Surgical Extraction
-1 Baleful Mastery
-1 Murderous Cut
-1 Echoing Truth
-// SIDEBOARDS
-1 Crypt Incursion
-2 Ensnaring Bridge
-3 Extirpate
-2 Soul-Guide Lantern
-2 Engineered Explosives
-1 Eliminate
-2 Ghost Quarter
-1 Go for the Throat
-Total of 60 cards in main deck and 14 in sideboard
+
+//----------------------------------------------------------------------
+// LANDS - 36 cards
+//----------------------------------------------------------------------
+22 Snow-Covered Plains - Used by 20/24 decks
+1 Eiganjo, Seat of the Empire - Used by 22/24 decks
+1 Flagstones of Trokair - Used by 20/24 decks
+1 Eiganjo Castle - Used by 19/24 decks
+1 Mishra's Factory - Used by 19/24 decks
+1 Castle Ardenvale - Used by 18/24 decks
+1 Mutavault - Used by 18/24 decks
+1 Shefet Dunes - Used by 18/24 decks
+1 Blinkmoth Nexus - Used by 15/24 decks
+1 Rishadan Port - Used by 14/24 decks
+1 Tectonic Edge - Used by 14/24 decks
+1 Urza's Saga - Used by 14/24 decks
+1 Cave of the Frost Dragon - Used by 14/24 decks
+1 Ghost Quarter - Used by 13/24 decks
+1 War Room - Used by 12/24 decks
+//----------------------------------------------------------------------
+// CREATURES - 42 cards
+//----------------------------------------------------------------------
+1 Mother of Runes - Used by 24/24 decks
+1 Thalia, Heretic Cathar - Used by 24/24 decks
+1 Thalia, Guardian of Thraben - Used by 23/24 decks
+1 Drannith Magistrate - Used by 21/24 decks
+1 Giver of Runes - Used by 21/24 decks
+1 Lion Sash - Used by 21/24 decks
+1 Luminarch Aspirant - Used by 21/24 decks
+1 Palace Jailer - Used by 21/24 decks
+1 Skyclave Apparition - Used by 21/24 decks
+1 Stoneforge Mystic - Used by 21/24 decks
+1 Adeline, Resplendent Cathar - Used by 20/24 decks
+1 Esper Sentinel - Used by 20/24 decks
+1 Leonin Arbiter - Used by 20/24 decks
+1 Cathar Commando - Used by 19/24 decks
+1 Giant Killer - Used by 19/24 decks
+1 Benevolent Bodyguard - Used by 19/24 decks
+1 Sanctifier en-Vec - Used by 19/24 decks
+1 Bounty Agent - Used by 18/24 decks
+1 Brimaz, King of Oreskos - Used by 18/24 decks
+1 Selfless Spirit - Used by 18/24 decks
+1 Tithe Taker - Used by 18/24 decks
+1 Weathered Wayfarer - Used by 18/24 decks
+1 Archon of Emeria - Used by 17/24 decks
+1 Solitude - Used by 17/24 decks
+1 White Plume Adventurer - Used by 17/24 decks
+1 Elite Spellbinder - Used by 17/24 decks
+1 Recruiter of the Guard - Used by 16/24 decks
+1 Phyrexian Revoker - Used by 15/24 decks
+1 Reidane, God of the Worthy - Used by 15/24 decks
+1 Ranger-Captain of Eos - Used by 15/24 decks
+1 Welcoming Vampire - Used by 15/24 decks
+1 Kytheon, Hero of Akros - Used by 13/24 decks
+1 Seasoned Dungeoneer - Used by 13/24 decks
+1 Knight of the White Orchid - Used by 13/24 decks
+1 Guardian of Faith - Used by 13/24 decks
+1 Archivist of Oghma - Used by 12/24 decks
+1 Grand Abolisher - Used by 12/24 decks
+1 Mirran Crusader - Used by 12/24 decks
+1 Anointed Peacekeeper - Used by 11/24 decks
+1 Sungold Sentinel - Used by 11/24 decks
+1 Anafenza, Kin-Tree Spirit - Used by 11/24 decks
+1 Selfless Savior - Used by 11/24 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 21 cards
+//----------------------------------------------------------------------
+1 Swords to Plowshares - Used by 24/24 decks
+1 Umezawa's Jitte - Used by 24/24 decks
+1 March of Otherworldly Light - Used by 22/24 decks
+1 Council's Judgment - Used by 21/24 decks
+1 Mana Tithe - Used by 20/24 decks
+1 Parallax Wave - Used by 20/24 decks
+1 Portable Hole - Used by 20/24 decks
+1 Gideon Blackblade - Used by 20/24 decks
+1 Armageddon - Used by 19/24 decks
+1 On Thin Ice - Used by 19/24 decks
+1 Reverent Mantra - Used by 18/24 decks
+1 Brave the Elements - Used by 18/24 decks
+1 Flawless Maneuver - Used by 17/24 decks
+1 Enlightened Tutor - Used by 16/24 decks
+1 Unexpectedly Absent - Used by 16/24 decks
+1 Smuggler's Copter - Used by 15/24 decks
+1 Skullclamp - Used by 14/24 decks
+1 The Wandering Emperor - Used by 14/24 decks
+1 Mox Amber - Used by 13/24 decks
+1 Fateful Absence - Used by 12/24 decks
+1 Sword of Fire and Ice - Used by 11/24 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 1 cards
+//----------------------------------------------------------------------
+1 Isamaru, Hound of Konda - Used by 15/24 decks
+TOLA320005770:mtgdeckbuild to126816$ 
+```
+```
+$ python3 mtgdeckbuild.py -d -c
+Select a format:
+1 - Peasant
+2 - Block
+3 - Extended
+4 - Highlander
+5 - Canadian Highlander
+6 - Explorer
+7 - Historic
+8 - Alchemy
+9 - Standard
+10 - Pioneer
+11 - Modern
+12 - Legacy
+13 - Vintage
+14 - Pauper
+15 - cEDH
+16 - Duel Commander
+17 - Premodern
+: 16
+Select an archetype:
+1 - Aminatou, the Fateshifter
+2 - Animar, Soul of Elements
+3 - Aragorn, King Of Gondor
+4 - Aragorn, The Uniter
+5 - Arwen, Mortal Queen
+6 - Atraxa, Grand Unifier
+7 - Atraxa, Praetors' Voice
+8 - Azusa, Lost But Seeking
+9 - Balmor, Battlemage Captain
+10 - Dennick, Pious Apprentice
+11 - Elminster
+12 - Emmara, Soul Of The Accord
+13 - Ertai Resurrected
+14 - Ghyrson Starn, Kelermorph
+15 - Golos, Tireless Pilgrim
+16 - Greasefang, Okiba Boss
+17 - Grenzo, Dungeon Warden
+18 - Grist, The Hunger Tide
+19 - Gut, True Soul Zealot
+20 - Indoraptor, the Perfect Hybrid
+21 - Jirina Kudro
+22 - Judith, the Scourge Diva
+23 - Juri, Master Of The Revue
+24 - Kelsien, the Plague
+25 - Kess, Dissident Mage
+26 - Kinnan, Bonder Prodigy
+27 - Klothys, God Of Destiny
+28 - Kroxa, Titan Of Death's Hunger
+29 - Kyodai, Soul Of Kamigawa
+30 - Leovold, Emissary of Trest
+31 - Light-Paws, Emperor's Voice
+32 - Maelstrom Wanderer
+33 - Marath, Will of the Wild
+34 - Migloz, Maze Crusher
+35 - Minsc, Beloved Ranger
+36 - Mono Black Control
+37 - Narset, Enlightened Master
+38 - Niv-Mizzet Reborn
+39 - Niv-Mizzet, Parun
+40 - Octavia, Living Thesis
+41 - Old Rutstein
+42 - Old Stickfingers
+43 - Other - Aggro
+44 - Other - Combo
+45 - Other - Control
+46 - Other Partner Aggro
+47 - Other Partner Combo
+48 - Other Partner Control
+49 - Prossh, Skyraider of Kher
+50 - Queen Marchesa
+51 - Raffine, Scheming Seer
+52 - Red Deck Wins
+53 - Slimefoot And Squee
+54 - Soul of Windgrace
+55 - Sygg, River Cutthroat
+56 - Sythis, Harvest's Hand
+57 - Teferi, Temporal Archmage
+58 - The Beamtown Bullies
+59 - The Gitrog Monster
+60 - The Ur-Dragon
+61 - Tivit, Seller Of Secrets
+62 - Weenie White
+63 - Will 11
+64 - Yoshimaru
+: 64
+Yoshimaru, Ever Faithful is used in all analyzed decks as Commander.
+Different commanders are used in analyzed decks. Select those you want to keep. If you want to select multiple commanders, use comma-separated choices (e.g. "1, 2")
+1 - Bruse Tarl, Boorish Herder
+2 - Ludevic, Necro-Alchemist
+3 - Tana, the Bloodsower
+4 - Reyhan, Last of the Abzan
+5 - Tymna the Weaver
+: 1
+
+
+//----------------------------------------------------------------------
+// LANDS - 39 cards
+//----------------------------------------------------------------------
+4 Plains - Used by 16/25 decks
+2 Mountain - Used by 17/25 decks
+1 Arid Mesa - Used by 25/25 decks
+1 Bloodstained Mire - Used by 25/25 decks
+1 Command Tower - Used by 25/25 decks
+1 Eiganjo Castle - Used by 25/25 decks
+1 Eiganjo, Seat of the Empire - Used by 25/25 decks
+1 Flooded Strand - Used by 25/25 decks
+1 Marsh Flats - Used by 25/25 decks
+1 Flagstones of Trokair - Used by 24/25 decks
+1 Minas Tirith - Used by 24/25 decks
+1 Windswept Heath - Used by 24/25 decks
+1 Wooded Foothills - Used by 24/25 decks
+1 Plaza of Heroes - Used by 23/25 decks
+1 Plateau - Used by 23/25 decks
+1 Sacred Foundry - Used by 23/25 decks
+1 Scalding Tarn - Used by 23/25 decks
+1 Sokenzan, Crucible of Defiance - Used by 23/25 decks
+1 Prismatic Vista - Used by 22/25 decks
+1 Battlefield Forge - Used by 22/25 decks
+1 Shinka, the Bloodsoaked Keep - Used by 22/25 decks
+1 Sunbaked Canyon - Used by 21/25 decks
+1 Urza's Saga - Used by 19/25 decks
+1 Inspiring Vantage - Used by 18/25 decks
+1 Clifftop Retreat - Used by 18/25 decks
+1 Rugged Prairie - Used by 17/25 decks
+1 Hammerheim - Used by 17/25 decks
+1 Mines of Moria - Used by 17/25 decks
+1 Den of the Bugbear - Used by 13/25 decks
+1 Mishra's Factory - Used by 13/25 decks
+1 Mana Confluence - Used by 12/25 decks
+1 Needleverge Pathway - Used by 12/25 decks
+1 The Grey Havens - Used by 11/25 decks
+1 Sundown Pass - Used by 11/25 decks
+1 Gemstone Caverns - Used by 10/25 decks
+//----------------------------------------------------------------------
+// CREATURES - 40 cards
+//----------------------------------------------------------------------
+1 Thalia, Guardian of Thraben - Used by 25/25 decks
+1 Solitude - Used by 24/25 decks
+1 White Plume Adventurer - Used by 24/25 decks
+1 Mother of Runes - Used by 23/25 decks
+1 Thalia, Heretic Cathar - Used by 23/25 decks
+1 Fury - Used by 23/25 decks
+1 Kari Zev, Skyship Raider - Used by 23/25 decks
+1 Merry, Esquire of Rohan - Used by 23/25 decks
+1 Adeline, Resplendent Cathar - Used by 22/25 decks
+1 Baird, Argivian Recruiter - Used by 22/25 decks
+1 Feldon, Ronom Excavator - Used by 22/25 decks
+1 Laelia, the Blade Reforged - Used by 22/25 decks
+1 Loyal Apprentice - Used by 22/25 decks
+1 Seasoned Dungeoneer - Used by 21/25 decks
+1 Skyclave Apparition - Used by 21/25 decks
+1 Giver of Runes - Used by 20/25 decks
+1 Skrelv, Defector Mite - Used by 20/25 decks
+1 Tajic, Legion's Edge - Used by 20/25 decks
+1 Zurgo Bellstriker - Used by 20/25 decks
+1 Palace Jailer - Used by 19/25 decks
+1 Selfless Spirit - Used by 19/25 decks
+1 Stoneforge Mystic - Used by 19/25 decks
+1 Ash, Party Crasher - Used by 19/25 decks
+1 Squee, Dubious Monarch - Used by 19/25 decks
+1 Caves of Chaos Adventurer - Used by 19/25 decks
+1 Drannith Magistrate - Used by 18/25 decks
+1 Kytheon, Hero of Akros - Used by 16/25 decks
+1 Magus of the Moon - Used by 16/25 decks
+1 Boromir, Warden of the Tower - Used by 15/25 decks
+1 Brimaz, King of Oreskos - Used by 14/25 decks
+1 Goro-Goro, Disciple of Ryusei - Used by 14/25 decks
+1 Samwise the Stouthearted - Used by 13/25 decks
+1 Ardoz, Cobbler of War - Used by 13/25 decks
+1 Isamaru, Hound of Konda - Used by 13/25 decks
+1 Cathar Commando - Used by 13/25 decks
+1 Benevolent Bodyguard - Used by 13/25 decks
+1 Giada, Font of Hope - Used by 11/25 decks
+1 Bonecrusher Giant - Used by 11/25 decks
+1 Winota, Joiner of Forces - Used by 10/25 decks
+1 Kellan, the Fae-Blooded - Used by 9/25 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 19 cards
+//----------------------------------------------------------------------
+1 Flowering of the White Tree - Used by 25/25 decks
+1 Shadowspear - Used by 25/25 decks
+1 Swords to Plowshares - Used by 25/25 decks
+1 Parallax Wave - Used by 24/25 decks
+1 Skullclamp - Used by 23/25 decks
+1 Lightning Bolt - Used by 23/25 decks
+1 Chain Lightning - Used by 22/25 decks
+1 Embercleave - Used by 22/25 decks
+1 Pyrokinesis - Used by 21/25 decks
+1 Forth Eorlingas! - Used by 20/25 decks
+1 Blood Moon - Used by 19/25 decks
+1 Flame Slash - Used by 18/25 decks
+1 Lightning Helix - Used by 16/25 decks
+1 Lithomantic Barrage - Used by 16/25 decks
+1 Umezawa's Jitte - Used by 13/25 decks
+1 Reverent Mantra - Used by 13/25 decks
+1 Oust - Used by 10/25 decks
+1 Bessie, the Doctor's Roadster - Used by 10/25 decks
+1 Gideon Blackblade - Used by 10/25 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 2 cards
+//----------------------------------------------------------------------
+1 Yoshimaru, Ever Faithful - Used by 25/25 decks
+1 Bruse Tarl, Boorish Herder - Used by 16/25 decks
+```
+```
+$ python3 mtgdeckbuild.py -n Dino -l 1
+Select a format:
+1 - Peasant
+2 - Block
+3 - Extended
+4 - Highlander
+5 - Canadian Highlander
+6 - Explorer
+7 - Historic
+8 - Alchemy
+9 - Standard
+10 - Pioneer
+11 - Modern
+12 - Legacy
+13 - Vintage
+14 - Pauper
+15 - cEDH
+16 - Duel Commander
+17 - Premodern
+: 9
+Select an archetype:
+1 - 4/5C Control
+2 - 4/5c Aggro
+3 - Abzan Aggro
+4 - Angels
+5 - Azorius Aggro
+6 - Bant Aggro
+7 - Bant Control
+8 - Boros Aggro
+9 - Dimir Aggro
+10 - Dimir Control
+11 - Esper Aggro
+12 - Esper Control
+13 - Golgari Aggro
+14 - Grixis Aggro
+15 - Grixis Control
+16 - Gruul Aggro
+17 - Izzet Control
+18 - Jeskai Aggro
+19 - Jeskai Control
+20 - Jund
+21 - Mono Black Aggro
+22 - Mono Black Control
+23 - Mono Blue Aggro
+24 - Mono Green Aggro
+25 - Mono Red Control
+26 - Mono White Control 
+27 - Naya Aggro
+28 - Naya Control
+29 - Orzhov Aggro
+30 - Orzhov Control
+31 - Other - Aggro
+32 - Other - Control
+33 - Rakdos Aggro
+34 - Rakdos Control
+35 - Reanimator
+36 - Red Deck Wins
+37 - Selesnya Aggro
+38 - Simic Aggro
+39 - Sultai Aggro
+40 - Sultai Control
+41 - UR Aggro
+42 - UW Control
+43 - Weenie White 
+: 16
+
+
+// MAIN DECK
+7 Forest
+3 Karplusan Forest
+3 Cavern of Souls
+2 Copperline Gorge
+4 Mountain
+2 Rockfall Vale
+2 Restless Ridgeline
+1 Sokenzan, Crucible of Defiance
+1 Boseiju, Who Endures
+4 Hulking Raptor
+4 Intrepid Paleontologist
+3 Trumpeting Carnosaur
+3 Bonehoard Dracosaur
+4 Ixalli's Lorekeeper
+4 Pugnacious Hammerskull
+2 Itzquinth, Firstborn of Gishath
+4 Palani's Hatcher
+3 Huatli, Poet of Unity
+4 Triumphant Chomp
+// SIDEBOARD
+4 Scytheclaw Raptor
+2 Itzquinth, Firstborn of Gishath
+3 Tamiyo's Safekeeping
+4 Thrashing Brontodon
+2 Earthshaker Dreadmaw
 ```
