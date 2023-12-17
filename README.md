@@ -737,7 +737,6 @@ Different commanders are used in analyzed decks. Select those you want to keep. 
 // SIDEBOARD - 1 cards
 //----------------------------------------------------------------------
 1 Isamaru, Hound of Konda - Used by 15/24 decks
-TOLA320005770:mtgdeckbuild to126816$ 
 ```
 ```
 $ python3 mtgdeckbuild.py -d -c
