@@ -12,7 +12,7 @@ A Magic: The Gathering format archetype average deck building tool based on TOP 
 * Support of all formats with automatic discovery.
 * Support of all archetypes with automatic discovery.
 * Support of filtering to only consider competitive decks.
-* Support of filtering to onyl consider decks including given card names in main deck and/or sideboard.
+* Support of filtering to only consider decks including given card names in main deck and/or sideboard.
 * Support of filtering to only consider decks including given names.
 * Support of filtering to only consider decks over the last given months.
 * Support of an interactive mode when executing the script.
