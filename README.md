@@ -11,9 +11,10 @@ A Magic: The Gathering format archetype average deck building tool based on TOP 
 * Support of [MTGTOP8](https://mtgtop8.com) as tournament data source.
 * Support of all formats with automatic discovery.
 * Support of all archetypes with automatic discovery.
-* Support of a filter to only consider competitive decks.
-* Support of a filter to only consider decks including given names.
-* Support of a filter to only consider decks over the last given months.
+* Support of filtering to only consider competitive decks.
+* Support of filtering to onyl consider decks including given card names in main deck and/or sideboard.
+* Support of filtering to only consider decks including given names.
+* Support of filtering to only consider decks over the last given months.
 * Support of an interactive mode when executing the script.
 * Support of simple or detailed printing of the average decklist.
 
@@ -39,7 +40,7 @@ You can display ***MTGDeckBuild*** startup parameters information by using the -
 
 ```
 $ python3 mtgdeckbuild.py -h
-usage: mtgdeckbuild.py [-h] [--details] [--competitive-only] [--name NAME] [--last-months LAST_MONTHS]
+usage: mtgdeckbuild.py [-h] [--details] [--competitive-only] [--name NAME] [--include-cards INCLUDE_CARDS] [--main-include] [--side-include] [--last-months LAST_MONTHS]
 
 options:
   -h, --help            show this help message and exit
@@ -47,6 +48,10 @@ options:
   --competitive-only, -c
                         Only consider competitive decks
   --name NAME, -n NAME  Only consider decks including given deck name
+  --include-cards INCLUDE_CARDS, -i INCLUDE_CARDS
+                        Only consider decks including given cards (use dash-separated card names if passing multiple cards, must be used with --main-deck/-m, --sideboard/-s arguments or both)
+  --main-include, -m    Consider cards to include for the main deck (must be used with --include-cards/-i)
+  --side-include, -s    Consider cards to include for the sideboard (must be used with --include-cards/-i)
   --last-months LAST_MONTHS, -l LAST_MONTHS
                         Only consider decks from the last given months
 ```
@@ -1038,4 +1043,291 @@ Select an archetype:
 3 Tamiyo's Safekeeping
 4 Thrashing Brontodon
 2 Earthshaker Dreadmaw
+```
+```
+$python mtgdeckbuild.py -i "Galvanic Blast - Haywire Mite" -m -d
+Select a format:
+1 - Peasant
+2 - Block
+3 - Extended
+4 - Highlander
+5 - Canadian Highlander
+6 - Explorer
+7 - Historic
+8 - Alchemy
+9 - Standard
+10 - Pioneer
+11 - Modern
+12 - Legacy
+13 - Vintage
+14 - Pauper
+15 - cEDH
+16 - Duel Commander
+17 - Premodern
+: 11
+Select an archetype:
+1 - 4/5c Aggro
+2 - 4c Control
+3 - Affinity
+4 - Amulet Titan
+5 - Calibrated Blast
+6 - Cascade Crash
+7 - CopyCat
+8 - Creativity
+9 - Creatures Toolbox
+10 - Death And Taxes
+11 - Death's Shadow
+12 - Dredge
+13 - Enchantress
+14 - Faeries
+15 - Goblins
+16 - Grixis Control
+17 - Gruul Aggro
+18 - Hammer Time
+19 - Hardened Scales
+20 - Heliod Life
+21 - Humans
+22 - Instant Reanimator
+23 - Jeskai Aggro
+24 - Jund
+25 - Living End
+26 - Mardu Midrange
+27 - Martyr Life
+28 - Merfolk
+29 - Mono Black Aggro
+30 - Mono Black Control
+31 - Orzhov Midrange
+32 - Other - Aggro
+33 - Other - Combo
+34 - Other - Control
+35 - Rakdos Aggro
+36 - Red Deck Wins
+37 - Scapeshift
+38 - Teaching Control
+39 - Temur Aggro
+40 - The One Ring Control
+41 - The Rock
+42 - The Underworld Cookbook
+43 - UB Mill
+44 - UR Aggro
+45 - UR Control
+46 - UW Control
+47 - Urza
+48 - UrzaTron
+49 - Valakut
+: 3
+
+
+//----------------------------------------------------------------------
+// LANDS - 17 cards
+//----------------------------------------------------------------------
+4 Darksteel Citadel - Used by 8/8 decks
+4 Urza's Saga - Used by 8/8 decks
+4 Silverbluff Bridge - Used by 6/8 decks
+2 Treasure Vault - Used by 6/8 decks
+2 Tanglepool Bridge - Used by 4/8 decks
+1 Island - Used by 8/8 decks
+//----------------------------------------------------------------------
+// CREATURES - 25 cards
+//----------------------------------------------------------------------
+4 Memnite - Used by 8/8 decks
+4 Ornithopter - Used by 8/8 decks
+4 Thought Monitor - Used by 8/8 decks
+4 Frogmite - Used by 6/8 decks
+4 Patchwork Automaton - Used by 6/8 decks
+3 Sojourner's Companion - Used by 6/8 decks
+1 Haywire Mite - Used by 8/8 decks
+1 Gingerbrute - Used by 5/8 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 18 cards
+//----------------------------------------------------------------------
+4 Springleaf Drum - Used by 8/8 decks
+4 Thoughtcast - Used by 8/8 decks
+3 Cranial Plating - Used by 8/8 decks
+3 Galvanic Blast - Used by 8/8 decks
+1 Shadowspear - Used by 8/8 decks
+1 Welding Jar - Used by 8/8 decks
+1 Aether Spellbomb - Used by 6/8 decks
+1 Nettlecyst - Used by 5/8 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 15 cards
+//----------------------------------------------------------------------
+3 Metallic Rebuke - Used by 8/8 decks
+2 Damping Sphere - Used by 5/8 decks
+2 Etched Champion - Used by 4/8 decks
+2 Soulless Jailer - Used by 4/8 decks
+2 Hurkyl's Recall - Used by 4/8 decks
+1 Pithing Needle - Used by 8/8 decks
+1 Haywire Mite - Used by 7/8 decks
+1 Grafdigger's Cage - Used by 4/8 decks
+1 Boom / Bust - Used by 3/8 decks
+```
+```
+$python mtgdeckbuild.py -i "Feldon, Ronom Excavator" -c -s
+Select a format:
+1 - Peasant
+2 - Block
+3 - Extended
+4 - Highlander
+5 - Canadian Highlander
+6 - Explorer
+7 - Historic
+8 - Alchemy
+9 - Standard
+10 - Pioneer
+11 - Modern
+12 - Legacy
+13 - Vintage
+14 - Pauper
+15 - cEDH
+16 - Duel Commander
+17 - Premodern
+: 16
+Select an archetype:
+1 - Aminatou, the Fateshifter
+2 - Animar, Soul of Elements
+3 - Aragorn, King Of Gondor
+4 - Aragorn, The Uniter
+5 - Arwen, Mortal Queen
+6 - Atraxa, Grand Unifier
+7 - Atraxa, Praetors' Voice
+8 - Azusa, Lost But Seeking
+9 - Balmor, Battlemage Captain
+10 - Dennick, Pious Apprentice
+11 - Elminster
+12 - Emmara, Soul Of The Accord
+13 - Ertai Resurrected
+14 - Esika, God Of The Tree
+15 - Ghyrson Starn, Kelermorph
+16 - Greasefang, Okiba Boss
+17 - Grist, The Hunger Tide
+18 - Gut, True Soul Zealot
+19 - Heliod, Sun-Crowned
+20 - Indoraptor, the Perfect Hybrid
+21 - Judith, the Scourge Diva
+22 - Juri, Master Of The Revue
+23 - Karlov Of The Ghost Council
+24 - Kelsien, the Plague
+25 - Kess, Dissident Mage
+26 - Kinnan, Bonder Prodigy
+27 - Klothys, God Of Destiny
+28 - Kroxa, Titan Of Death's Hunger
+29 - Leovold, Emissary of Trest
+30 - Light-Paws, Emperor's Voice
+31 - Maelstrom Wanderer
+32 - Magda, Brazen Outlaw
+33 - Marath, Will of the Wild
+34 - Migloz, Maze Crusher
+35 - Minsc, Beloved Ranger
+36 - Mono Black Control
+37 - Narset, Enlightened Master
+38 - Niv-Mizzet Reborn
+39 - Niv-Mizzet, Parun
+40 - Octavia, Living Thesis
+41 - Old Rutstein
+42 - Old Stickfingers
+43 - Other - Aggro
+44 - Other - Combo
+45 - Other - Control
+46 - Other Partner Aggro
+47 - Other Partner Combo
+48 - Other Partner Control
+49 - Prossh, Skyraider of Kher
+50 - Queen Marchesa
+51 - Raffine, Scheming Seer
+52 - Red Deck Wins
+53 - Saskia the Unyielding
+54 - Slimefoot And Squee
+55 - Soul of Windgrace
+56 - Sythis, Harvest's Hand
+57 - Teferi, Temporal Archmage
+58 - The Beamtown Bullies
+59 - The Gitrog Monster
+60 - The Ur-Dragon
+61 - Tivit, Seller Of Secrets
+62 - Weenie White
+63 - Will 11
+64 - Yoshimaru
+: 52
+
+
+// MAIN DECK
+1 Ramunap Ruins
+1 Mutavault
+1 Den of the Bugbear
+1 Mishra's Factory
+1 Sokenzan, Crucible of Defiance
+1 Barbarian Ring
+24 Snow-Covered Mountain
+1 Arid Mesa
+1 Bloodstained Mire
+1 Scalding Tarn
+1 Wooded Foothills
+1 War Room
+1 Prismatic Vista
+1 Shinka, the Bloodsoaked Keep
+1 Castle Embereth
+1 Bomat Courier
+1 Laelia, the Blade Reforged
+1 Monastery Swiftspear
+1 Soul-Scar Mage
+1 Zurgo Bellstriker
+1 Goblin Guide
+1 Loyal Apprentice
+1 Magus of the Moon
+1 Falkenrath Pit Fighter
+1 Bonecrusher Giant
+1 Fury
+1 Ahn-Crop Crasher
+1 Grim Lavamancer
+1 Dragon's Rage Channeler
+1 Falkenrath Gorger
+1 Icehide Golem
+1 Embereth Veteran
+1 Phoenix of Ash
+1 Eidolon of the Great Revel
+1 Stromkirk Noble
+1 Slicer, Hired Muscle
+1 Squee, Dubious Monarch
+1 Arc Trail
+1 Fiery Confluence
+1 Fireblast
+1 Incinerate
+1 Lightning Bolt
+1 Lightning Strike
+1 Pyrokinesis
+1 Chain Lightning
+1 Exquisite Firecraft
+1 Light Up the Stage
+1 Play with Fire
+1 Rift Bolt
+1 Seal of Fire
+1 Searing Blaze
+1 Searing Spear
+1 Skewer the Critics
+1 Wild Slash
+1 Blood Moon
+1 Forked Bolt
+1 Kumano Faces Kakkazan
+1 Lava Spike
+1 Slaying Fire
+1 Burst Lightning
+1 Galvanic Blast
+1 Sulfuric Vortex
+1 Tarfire
+1 Flames of the Blood Hand
+1 Roil Eruption
+1 Skullcrack
+1 Incendiary Flow
+1 Invasion of Regatha
+1 Shock
+1 Volcanic Hammer
+1 Reckless Impulse
+1 Wrenn's Resolve
+1 Flame Javelin
+1 Chandra, Torch of Defiance
+1 Flame Slash
+1 Force of Rage
+// SIDEBOARD
+1 Feldon, Ronom Excavator
 ```

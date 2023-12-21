@@ -1,9 +1,10 @@
 from argparse import ArgumentParser, RawTextHelpFormatter
 from rich.prompt import Prompt
 from requests import get, post
+from urllib.parse import quote
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from re import compile
+from re import compile, match
 
 
 mtgtop8_base_url = 'https://mtgtop8.com'
@@ -237,6 +238,27 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
+        '--include-cards', '-i',
+        type = str,
+        action='store',
+        help = 'Only consider decks including given cards (use dash-separated card names if passing multiple cards, must be used with --main-deck/-m, --sideboard/-s arguments or both)'
+    )
+
+    parser.add_argument(
+        '--main-include', '-m',
+        action = 'store_true',
+        default = False,
+        help = 'Consider cards to include for the main deck (must be used with --include-cards/-i)'
+    )
+
+    parser.add_argument(
+        '--side-include', '-s',
+        action = 'store_true',
+        default = False,
+        help = 'Consider cards to include for the sideboard (must be used with --include-cards/-i)'
+    )
+
+    parser.add_argument(
         '--last-months', '-l',
         type = int,
         action='store',
@@ -248,6 +270,21 @@ if __name__ == '__main__':
     print_with_details = args['details']
     competitive = args['competitive_only']
     deck_name = args['name']
+    included_cards = args['include_cards']
+    if included_cards:
+        if not match(r'^[\w\s\',]+(-[\w\s\', ]+)?$', included_cards):
+            print('argument --include-cards/-i: must be a dash-separated list of strings')
+            exit()
+        else:
+            included_cards = included_cards.replace(' - ', '\r\n')
+            included_cards = included_cards.replace('-', '\r\n')
+            included_cards = included_cards.replace('- ', '\r\n')
+            included_cards = included_cards.replace(' -', '\r\n')
+    main_include = args['main_include']
+    side_include = args['side_include']
+    if (included_cards and not (main_include or side_include)) or (not included_cards and (main_include or side_include)):
+        print('argument --include-cards/-i: must be used along with --main-include/-m and/or --side-include/-s')
+        exit()
     last_months = args['last_months']
     if last_months and (last_months < 1):
         print('argument --last-months/-l: must be a positive number')
@@ -262,6 +299,12 @@ if __name__ == '__main__':
         deck_search_str += '&compet_check%5BP%5D=1&compet_check%5BM%5D=1&compet_check%5BC%5D=1'
     if deck_name:
         deck_search_str += f'&deck_titre={deck_name}'
+    if (main_include or side_include):
+        if main_include:
+            deck_search_str += '&MD_check=1'
+        if side_include:
+            deck_search_str += '&SB_check=1'
+        deck_search_str += f'&cards={quote(included_cards)}'
     if last_months:
         date_str = (datetime.now()-timedelta(days=30*last_months)).strftime('%d/%m/%Y').replace('/', '%2F')
         deck_search_str += f'&date_start={date_str}'
