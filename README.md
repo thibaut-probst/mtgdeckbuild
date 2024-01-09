@@ -1,22 +1,22 @@
 # mtgdeckbuild
-A Magic: The Gathering format archetype deck building tool based on TOP 8 tournaments results.
+A Magic: The Gathering format archetype average deck building tool based on tournaments results.
 
 # MTGDeckBuild
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)  
 ---  
-A Magic: The Gathering format archetype average deck building tool based on TOP 8 tournaments results. Deck building is based on currently played archetypes and most used cards in tournaments decks. Generally, the last 25 decks are used but some filter may affect the number of analyzed decks.
+A Magic: The Gathering format archetype average deck building tool based on tournaments results. Deck building is based on currently played archetypes and most used cards in tournaments decks. Generally, the last 25 decks are used but some filter may affect the number of analyzed decks.
 
 ## Features
 
-* Support of [MTGTOP8](https://mtgtop8.com) as tournament data source.
+* Support of [MTGTOP8](https://mtgtop8.com) and [MTGDECKS](https://mtgdecks.net) as website data sources.
 * Support of all formats with automatic discovery.
-* Support of all archetypes with automatic discovery.
-* Support of filtering to only consider competitive decks.
-* Support of filtering to only consider decks including given card names in main deck and/or sideboard.
-* Support of filtering to only consider decks including given names.
-* Support of filtering to only consider decks over the last given months.
-* Support of an interactive mode when executing the script.
-* Support of simple or detailed printing of the average decklist.
+* Support of all archetypes with automatic discovery and possibility to only parse a given number of top archetypes.
+* Filtering available to only consider competitive decks (only for MTGTOP8).
+* Filtering available to only consider decks including given card names in main deck and/or sideboard.
+* Filtering available to only consider decks including given names (only for MTGTOP8).
+* Filtering available to only consider decks over the last given months (only for MTGTOP8).
+* Interactive mode when executing the script.
+* Simple or detailed printing of the average decklist available.
 
 ## Requirements
 
@@ -40,20 +40,26 @@ You can display ***MTGDeckBuild*** startup parameters information by using the -
 
 ```
 $ python3 mtgdeckbuild.py -h
-usage: mtgdeckbuild.py [-h] [--details] [--competitive-only] [--name NAME] [--include-cards INCLUDE_CARDS] [--main-include] [--side-include] [--last-months LAST_MONTHS]
+usage: mtgdeckbuild.py [-h] [--website-source WEBSITE_SOURCE] [--top-archetypes TOP_ARCHETYPES] [--details]
+                       [--competitive-only] [--name NAME] [--include-cards INCLUDE_CARDS] [--main-include]
+                       [--side-include] [--last-months LAST_MONTHS]
 
 options:
   -h, --help            show this help message and exit
+  --website-source WEBSITE_SOURCE, -w WEBSITE_SOURCE
+                        Website data source to use (mtgtop8 or mtgdecks ; default: mtgtop8)
+  --top-archetypes TOP_ARCHETYPES, -t TOP_ARCHETYPES
+                        The number of top archetypes to parse (default: all archetypes)
   --details, -d         Print deck with details: sections and number of decks using each card
   --competitive-only, -c
-                        Only consider competitive decks
-  --name NAME, -n NAME  Only consider decks including given deck name
+                        Only consider competitive decks (only for MTGTOP8)
+  --name NAME, -n NAME  Only consider decks including given deck name (only for MTGTOP8)
   --include-cards INCLUDE_CARDS, -i INCLUDE_CARDS
                         Only consider decks including given cards (use dash-separated card names if passing multiple cards, must be used with --main-deck/-m, --sideboard/-s arguments or both)
-  --main-include, -m    Consider cards to include for the main deck (must be used with --include-cards/-i)
+  --main-include, -m    Consider cards to include for the main deck (must be used with --include-cards/-i, also include cards for the sideboard for MTGDECKS)
   --side-include, -s    Consider cards to include for the sideboard (must be used with --include-cards/-i)
   --last-months LAST_MONTHS, -l LAST_MONTHS
-                        Only consider decks from the last given months
+                        Only consider decks from the last given months (only for MTGTOP8)
 ```
 
 ## Examples
@@ -1045,7 +1051,7 @@ Select an archetype:
 2 Earthshaker Dreadmaw
 ```
 ```
-$python mtgdeckbuild.py -i "Galvanic Blast - Haywire Mite" -m -d
+$python3 mtgdeckbuild.py -i "Galvanic Blast - Haywire Mite" -m -d
 Select a format:
 1 - Peasant
 2 - Block
@@ -1163,7 +1169,7 @@ Select an archetype:
 1 Boom / Bust - Used by 3/8 decks
 ```
 ```
-$python mtgdeckbuild.py -i "Feldon, Ronom Excavator" -c -s
+$python3 mtgdeckbuild.py -i "Feldon, Ronom Excavator" -c -s
 Select a format:
 1 - Peasant
 2 - Block
@@ -1330,4 +1336,786 @@ Select an archetype:
 1 Force of Rage
 // SIDEBOARD
 1 Feldon, Ronom Excavator
+```
+```
+$ python3 mtgdeckbuild.py -w mtgdecks -t 15 -d
+Select a format:
+1 - Standard
+2 - Pioneer
+3 - Modern
+4 - Pauper
+5 - Alchemy
+6 - Explorer
+7 - Historic
+8 - Timeless
+9 - Commander
+10 - Duel-Commander
+11 - Brawl
+12 - Historic-Brawl
+13 - Legacy
+14 - Vintage
+15 - Premodern
+16 - Old-School
+: 10
+Select an archetype:
+1 - Aminatou, the Fateshifter
+2 - Aragorn, King of Gondor
+3 - Atraxa, Grand Unifier
+4 - Bruse Tarl, Boorish Herder
+5 - Dihada, Binder of Wills
+6 - Ertai Resurrected
+7 - Feldon, Ronom Excavator
+8 - Ghyrson Starn, Kelermorph
+9 - Grist, the Hunger Tide
+10 - Raffine, Scheming Seer
+11 - Slimefoot and Squee
+12 - Tana, the Bloodsower
+13 - Tivit, Seller of Secrets
+14 - Tymna the Weaver
+15 - Yoshimaru, Ever Faithful
+: 3
+
+
+//----------------------------------------------------------------------
+// LANDS - 41 cards
+//----------------------------------------------------------------------
+1 Arid Mesa - Used by 25/25 decks
+1 Command Tower - Used by 25/25 decks
+1 Hallowed Fountain - Used by 25/25 decks
+1 Marsh Flats - Used by 25/25 decks
+1 Misty Rainforest - Used by 25/25 decks
+1 Otawara, Soaring City - Used by 25/25 decks
+1 Raffine's Tower - Used by 25/25 decks
+1 Scalding Tarn - Used by 25/25 decks
+1 Verdant Catacombs - Used by 25/25 decks
+1 Watery Grave - Used by 25/25 decks
+1 Windswept Heath - Used by 25/25 decks
+1 Zagoth Triome - Used by 25/25 decks
+1 Bayou - Used by 24/25 decks
+1 Flooded Strand - Used by 24/25 decks
+1 Glacial Fortress - Used by 24/25 decks
+1 Polluted Delta - Used by 24/25 decks
+1 Reflecting Pool - Used by 24/25 decks
+1 Spara's Headquarters - Used by 24/25 decks
+1 Wooded Foothills - Used by 24/25 decks
+1 Bloodstained Mire - Used by 23/25 decks
+1 Deserted Beach - Used by 23/25 decks
+1 Drowned Catacomb - Used by 23/25 decks
+1 Savannah - Used by 23/25 decks
+1 Scrubland - Used by 23/25 decks
+1 Temple of the False God - Used by 23/25 decks
+1 Tropical Island - Used by 23/25 decks
+1 Underground Sea - Used by 23/25 decks
+1 Boseiju, Who Endures - Used by 22/25 decks
+1 Mystic Sanctuary - Used by 22/25 decks
+1 Prismatic Vista - Used by 22/25 decks
+1 Shipwreck Marsh - Used by 22/25 decks
+1 Tundra - Used by 22/25 decks
+1 Island - Used by 22/25 decks
+1 Plains - Used by 22/25 decks
+1 Swamp - Used by 22/25 decks
+1 Forest - Used by 21/25 decks
+1 Path of Ancestry - Used by 20/25 decks
+1 Hinterland Harbor - Used by 18/25 decks
+1 Seachrome Coast - Used by 17/25 decks
+1 Hengegate Pathway - Used by 16/25 decks
+1 Mystic Gate - Used by 16/25 decks
+//----------------------------------------------------------------------
+// CREATURES - 5 cards
+//----------------------------------------------------------------------
+1 Baleful Strix - Used by 25/25 decks
+1 Snapcaster Mage - Used by 25/25 decks
+1 Solitude - Used by 25/25 decks
+1 Orcish Bowmasters - Used by 23/25 decks
+1 Emrakul, the Promised End - Used by 21/25 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 53 cards
+//----------------------------------------------------------------------
+1 Abrupt Decay - Used by 25/25 decks
+1 Brainstorm - Used by 25/25 decks
+1 Cut Down - Used by 25/25 decks
+1 Dark Ritual - Used by 25/25 decks
+1 Memory Lapse - Used by 25/25 decks
+1 Swords to Plowshares - Used by 25/25 decks
+1 Demonic Tutor - Used by 25/25 decks
+1 Supreme Verdict - Used by 25/25 decks
+1 Toxic Deluge - Used by 25/25 decks
+1 Teferi, Time Raveler - Used by 25/25 decks
+1 Shorikai, Genesis Engine - Used by 24/25 decks
+1 Cling to Dust - Used by 24/25 decks
+1 Counterspell - Used by 24/25 decks
+1 Fatal Push - Used by 24/25 decks
+1 Force of Will - Used by 24/25 decks
+1 Mana Leak - Used by 24/25 decks
+1 Sauron's Ransom - Used by 24/25 decks
+1 Damn - Used by 24/25 decks
+1 Preordain - Used by 24/25 decks
+1 Leyline Binding - Used by 24/25 decks
+1 Oko, Thief of Crowns - Used by 24/25 decks
+1 Force Spike - Used by 23/25 decks
+1 Kaya's Guile - Used by 23/25 decks
+1 Lose Focus - Used by 23/25 decks
+1 Memory Deluge - Used by 23/25 decks
+1 Tainted Pact - Used by 23/25 decks
+1 Void Rend - Used by 23/25 decks
+1 Wash Away - Used by 23/25 decks
+1 Ponder - Used by 23/25 decks
+1 Dream Halls - Used by 23/25 decks
+1 Spell Snare - Used by 23/25 decks
+1 Cryptic Command - Used by 22/25 decks
+1 Drown in the Loch - Used by 22/25 decks
+1 Force of Negation - Used by 22/25 decks
+1 Mana Tithe - Used by 22/25 decks
+1 Mystic Confluence - Used by 22/25 decks
+1 Stern Scolding - Used by 22/25 decks
+1 Tale's End - Used by 22/25 decks
+1 Prismatic Ending - Used by 22/25 decks
+1 The Wandering Emperor - Used by 22/25 decks
+1 Evasive Action - Used by 21/25 decks
+1 Jace, the Mind Sculptor - Used by 21/25 decks
+1 Arcane Signet - Used by 20/25 decks
+1 Cosmic Rebirth - Used by 20/25 decks
+1 Growth Spiral - Used by 20/25 decks
+1 Lórien Revealed - Used by 20/25 decks
+1 Teferi, Hero of Dominaria - Used by 20/25 decks
+1 Archmage's Charm - Used by 19/25 decks
+1 Remand - Used by 18/25 decks
+1 Reprieve - Used by 16/25 decks
+1 Unexpectedly Absent - Used by 15/25 decks
+1 Oust - Used by 14/25 decks
+1 Sunset Revelry - Used by 13/25 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 1 cards
+//----------------------------------------------------------------------
+1 Atraxa, Grand Unifier - Used by 25/25 decks
+```
+```
+$ python3 mtgdeckbuild.py -w mtgdecks 
+Select a format:
+1 - Standard
+2 - Pioneer
+3 - Modern
+4 - Pauper
+5 - Alchemy
+6 - Explorer
+7 - Historic
+8 - Timeless
+9 - Commander
+10 - Duel-Commander
+11 - Brawl
+12 - Historic-Brawl
+13 - Legacy
+14 - Vintage
+15 - Premodern
+16 - Old-School
+: 1
+Select an archetype:
+1 - 4 Color Angels
+2 - 4 Color Beanstalk
+3 - 4 Color Control
+4 - 4 Color Discover
+5 - 4 Color Dragons
+6 - 4 Color Emergence
+7 - 4 Color Legends
+8 - 4 Color Midrange
+9 - 4 Color Pia
+10 - 4 Color Reanimator
+11 - 4 Color Rona
+12 - 4 Color Superfriends
+13 - 4 Color Tokens
+14 - 4 Color Vampires
+15 - 4 Color Werewolves
+16 - 5 Color Humans
+17 - 5 Color Legends
+18 - 5 Color Praetors
+19 - 5 Color Reanimator
+20 - Abzan Angels
+21 - Abzan Control
+22 - Abzan Humans
+23 - Abzan Lifegain
+24 - Abzan Midrange
+25 - Abzan Phyrexians
+26 - Abzan Ramp
+27 - Abzan Rigging
+28 - Abzan Sacrifice
+29 - Abzan Toxic
+30 - Azorius Adventures
+31 - Azorius Angels
+32 - Azorius Apparatus
+33 - Azorius Artifacts
+34 - Azorius Awakening
+35 - Azorius Blink
+36 - Azorius Calendar
+37 - Azorius Control
+38 - Azorius Convoke
+39 - Azorius Craft
+40 - Azorius Flash
+41 - Azorius Justice
+42 - Azorius Mentor
+43 - Azorius Midrange
+44 - Azorius Mill
+45 - Azorius Powerstones
+46 - Azorius Prototypes
+47 - Azorius Schooner
+48 - Azorius Soldiers
+49 - Azorius Spirits
+50 - Azorius Superfriends
+51 - Azorius Tempo
+52 - Azorius Tezzeret
+53 - Azorius Toxic
+54 - Bant Aggro
+55 - Bant Angels
+56 - Bant Beanstalk
+57 - Bant Control
+58 - Bant Midrange
+59 - Bant Ramp
+60 - Bant Superfriends
+61 - Bant Tokens
+62 - Bant Toxic
+63 - Big Boros
+64 - Big Red
+65 - Boros Aggro
+66 - Boros Artifacts
+67 - Boros Blink
+68 - Boros Calendar
+69 - Boros Control
+70 - Boros Convoke
+71 - Boros Counters
+72 - Boros Craft
+73 - Boros Discover
+74 - Boros Equipments
+75 - Boros Humans
+76 - Boros Justice
+77 - Boros Mentor
+78 - Boros Midrange
+79 - Boros Ojer Pingers
+80 - Boros Pia
+81 - Boros Powerstones
+82 - Boros Soldiers
+83 - Boros Tokens
+84 - Boros Virtuoso
+85 - Brass Reclamation
+86 - Caves
+87 - Chaotic Transformation
+88 - Dimir Breach
+89 - Dimir Caves
+90 - Dimir Control
+91 - Dimir Convoke
+92 - Dimir Descend
+93 - Dimir Faeries
+94 - Dimir Midrange
+95 - Dimir Mill
+96 - Dimir Mindlink
+97 - Dimir Ninjas
+98 - Dimir Proliferate
+99 - Dimir Proxy
+100 - Dimir Reanimator
+101 - Dimir Schooner
+102 - Dimir Tempo
+103 - Dimir Throne
+104 - Dimir Wizards
+105 - Dimir Zombies
+106 - Domain Adventures
+107 - Domain Alara
+108 - Domain Discover
+109 - Domain Ramp
+110 - Esper Adventures
+111 - Esper Aggro
+112 - Esper Angels
+113 - Esper Awakening
+114 - Esper Control
+115 - Esper Faeries
+116 - Esper Flash
+117 - Esper Greasefang
+118 - Esper Justice
+119 - Esper Midrange
+120 - Esper Poison
+121 - Esper Roles
+122 - Esper Rona
+123 - Esper Sacrifice
+124 - Esper Soldiers
+125 - Esper Superfriends
+126 - Esper Tempo
+127 - Esper Tezzeret
+128 - Esper Tokens
+129 - Esper Zur
+130 - Goblins
+131 - Golgari Cauldron
+132 - Golgari Descend
+133 - Golgari Emergence
+134 - Golgari Food
+135 - Golgari Midrange
+136 - Golgari Phyrexians
+137 - Golgari Ramp
+138 - Golgari Rigging
+139 - Golgari Zombies
+140 - Grixis Adventures
+141 - Grixis Anvil
+142 - Grixis Casualty Combo
+143 - Grixis Control
+144 - Grixis Descend
+145 - Grixis Discover
+146 - Grixis Dragons
+147 - Grixis Hellraiser
+148 - Grixis Midrange
+149 - Grixis Olivia
+150 - Grixis Pirates
+151 - Grixis Ramp
+152 - Grixis Reanimator
+153 - Grixis Sacrifice
+154 - Grixis Singularity
+155 - Grixis Throne
+156 - Gruul Aggro
+157 - Gruul Calendar
+158 - Gruul Counters
+159 - Gruul Dinosaurs
+160 - Gruul Discover
+161 - Gruul Food
+162 - Gruul Midrange
+163 - Gruul Powerstones
+164 - Gruul Ramp
+165 - Gruul Ramp
+166 - Gruul Werewolves
+167 - Izzet Artifacts
+168 - Izzet Calendar
+169 - Izzet Control
+170 - Izzet Midrange
+171 - Izzet Mindlink
+172 - Izzet Pirates
+173 - Izzet Ramp
+174 - Izzet Schooner
+175 - Izzet Spellslinger
+176 - Jeskai Artifact
+177 - Jeskai Control
+178 - Jeskai Discover
+179 - Jeskai Dragons
+180 - Jeskai Humans
+181 - Jeskai Mentor
+182 - Jeskai Midrange
+183 - Jeskai Pia
+184 - Jeskai Soldiers
+185 - Jeskai Tezzeret
+186 - Jund Aggro
+187 - Jund Anvil
+188 - Jund Bombardment
+189 - Jund Cauldron
+190 - Jund Dinosaurs
+191 - Jund Discover
+192 - Jund Emergence
+193 - Jund Graveyard
+194 - Jund Midrange
+195 - Jund Ramp
+196 - Jund Reanimator
+197 - Jund Rigging
+198 - Jund Throne
+199 - MTGA decklists
+200 - Mardu Anvil
+201 - Mardu Calendar
+202 - Mardu Discover
+203 - Mardu Greasefang
+204 - Mardu Humans
+205 - Mardu Kirin
+206 - Mardu Midrange
+207 - Mardu Ratadrabik
+208 - Mardu Reanimator
+209 - Mardu Sacrifice
+210 - Mardu Vampires
+211 - Mono Black
+212 - Mono Black Rats
+213 - Mono Blue Artifacts
+214 - Mono Blue Ninjas
+215 - Mono Blue Tempo
+216 - Mono Green
+217 - Mono Red Calendar
+218 - Mono Red Dragons
+219 - Mono White Angels
+220 - Mono White Control
+221 - Mono White Craft
+222 - Mono White Midrange
+223 - Mono White Ramp
+224 - Mono White Toxic
+225 - Naya Artifacts
+226 - Naya Calendar
+227 - Naya Cascade
+228 - Naya Counters
+229 - Naya Dinosaurs
+230 - Naya Discover
+231 - Naya Gnomes
+232 - Naya Humans
+233 - Naya Legends
+234 - Naya Midrange
+235 - Naya Pia
+236 - Naya Ramp
+237 - Naya Throne
+238 - Naya Tokens
+239 - Naya Virtuoso
+240 - Naya Werewolves
+241 - Orzhov Angels
+242 - Orzhov Artifacts
+243 - Orzhov Blink
+244 - Orzhov Control
+245 - Orzhov Convoke
+246 - Orzhov Humans
+247 - Orzhov Justice
+248 - Orzhov Lifegain
+249 - Orzhov Midrange
+250 - Orzhov Roles
+251 - Orzhov Sacrifice
+252 - Orzhov Scam
+253 - Orzhov Superfriends
+254 - Orzhov Tokens
+255 - Orzhov Toxic
+256 - Orzhov Vampires
+257 - Rainbow Humans
+258 - Rakdos Aggro
+259 - Rakdos Anvil
+260 - Rakdos Beseech
+261 - Rakdos Bombardment
+262 - Rakdos Conquest
+263 - Rakdos Discover
+264 - Rakdos Inti
+265 - Rakdos Kingpin
+266 - Rakdos Midrange
+267 - Rakdos Ramp
+268 - Rakdos Rats
+269 - Rakdos Reanimator
+270 - Rakdos Sacrifice
+271 - Rakdos Vampires
+272 - Red Deck Wins
+273 - Red Deck Wins
+274 - Rogue
+275 - Selesnya Angels
+276 - Selesnya Artifacts
+277 - Selesnya Cats
+278 - Selesnya Counters
+279 - Selesnya Enchantments
+280 - Selesnya Humans
+281 - Selesnya Midrange
+282 - Selesnya Ramp
+283 - Selesnya Reconstruction
+284 - Selesnya Rootpriest
+285 - Selesnya Tokens
+286 - Selesnya Toxic
+287 - Simic Beanstalk
+288 - Simic Cauldron
+289 - Simic Food
+290 - Simic Grounds
+291 - Simic Merfolks
+292 - Simic Ramp
+293 - Simic Tempo
+294 - Simic Tezzeret
+295 - Sultai Calendar
+296 - Sultai Cauldron
+297 - Sultai Drawing
+298 - Sultai Emergence
+299 - Sultai Graveyard
+300 - Sultai Midrange
+301 - Sultai Rigging
+302 - Sultai Slogurk
+303 - Sultai Toxic
+304 - Temur Cauldron
+305 - Temur Counters
+306 - Temur Discover
+307 - Temur Prowess
+308 - Temur Throne
+309 - Temur Treasures
+310 - White Weenie
+: 229
+
+
+// MAIN DECK
+4 Forest
+3 Cavern of Souls
+2 Mountain
+4 Copperline Gorge
+3 Karplusan Forest
+4 Rockfall Vale
+2 Restless Ridgeline
+1 Boseiju, Who Endures
+2 Plains
+2 Gishath, Sun's Avatar
+4 Pugnacious Hammerskull
+3 Trumpeting Carnosaur
+3 Etali, Primal Conqueror
+4 Ixalli's Lorekeeper
+2 Bonehoard Dracosaur
+2 Ghalta, Stampede Tyrant
+3 Intrepid Paleontologist
+2 Bramble Familiar
+3 Hulking Raptor
+4 Fight Rigging
+3 Glimpse the Core
+// SIDEBOARD
+3 Lithomantic Barrage
+3 Scytheclaw Raptor
+1 Burn Down the House
+2 Tyrranax Rex
+2 Abrade
+2 Get Lost
+2 Tranquil Frillback
+```
+```
+$ python3 mtgdeckbuild.py -w mtgdecks -s -i "Get Lost" -d
+Select a format:
+1 - Standard
+2 - Pioneer
+3 - Modern
+4 - Pauper
+5 - Alchemy
+6 - Explorer
+7 - Historic
+8 - Timeless
+9 - Commander
+10 - Duel-Commander
+11 - Brawl
+12 - Historic-Brawl
+13 - Legacy
+14 - Vintage
+15 - Premodern
+16 - Old-School
+: 2
+Select an archetype:
+1 - 4 Color Adventures
+2 - 4 Color Ascendancy
+3 - 4 Color Greasefang
+4 - 4 Color Gyruda
+5 - 4 Color Knights
+6 - 4 Color Omnath
+7 - 4 Color Rona
+8 - 5 Color Midrange
+9 - 5 Color Niv-Mizzet
+10 - 5 Color Superfriends
+11 - 5 Color Transmogrify
+12 - Abzan Amalia
+13 - Abzan Company
+14 - Abzan Deathtouch
+15 - Abzan Greasefang
+16 - Abzan Midrange
+17 - Acererak Combo
+18 - Angels
+19 - Archfiend Alteration
+20 - Atarka Red
+21 - Azorius Auras
+22 - Azorius Control
+23 - Azorius Craft
+24 - Azorius Devotion
+25 - Azorius Enigma
+26 - Azorius Flash
+27 - Azorius Lotus Field
+28 - Azorius Powerstones
+29 - Azorius Soldiers
+30 - Azorius Spirits
+31 - Bant Auras
+32 - Bant Company
+33 - Bant Control
+34 - Bant Flash
+35 - Bant Lotus Field
+36 - Bant Spirits
+37 - Boros Aggro
+38 - Boros Convoke
+39 - Boros Flash
+40 - Boros Heroic
+41 - Boros Humans
+42 - Boros Mentor
+43 - Boros Pia
+44 - Boros Prowess
+45 - Boros Transmogrify
+46 - Boros Vehicles
+47 - Bring to Beanstalk
+48 - Bring to Light
+49 - Cats
+50 - Death and Taxes
+51 - Dimir Control
+52 - Dimir Delver
+53 - Dimir Faeries
+54 - Dimir Mindlink
+55 - Dimir Narset-Thief
+56 - Dimir Pirates
+57 - Dimir Rogues
+58 - Dinosaurs
+59 - Discover Evolution
+60 - Domain Ramp
+61 - Dredge
+62 - Eldrazi Ramp
+63 - Elementals
+64 - Elves
+65 - Enigmatic Incarnation
+66 - Ensoul Artifacts
+67 - Esper Control
+68 - Esper Greasefang
+69 - Esper Superfriends
+70 - Esper Yorion
+71 - Gates
+72 - Goblins
+73 - Gods Tree
+74 - Golgari Company
+75 - Golgari Midrange
+76 - Golgari Rigging
+77 - Golgari Seasons Past
+78 - Golgari Toxic
+79 - Golgari Vampires
+80 - Golgari Vehicles
+81 - Green Devotion
+82 - Grinning Ignus Combo
+83 - Grixis Bolas
+84 - Grixis Drake
+85 - Grixis Midrange
+86 - Grixis Phoenix
+87 - Grixis Reanimator
+88 - Grixis Spells
+89 - Grixis Transmogrify
+90 - Grixis Vampires
+91 - Gruul Aggro
+92 - Gruul Bard Class
+93 - Gruul Company
+94 - Gruul Convoke
+95 - Gruul Dragons
+96 - Gruul Gods Scapeshift
+97 - Gruul Midrange
+98 - Gruul Obosh
+99 - Gruul Prowess
+100 - Gruul Ramp
+101 - Gruul Vehicles
+102 - Hammer Time
+103 - Hardened Scales
+104 - Izzet Control
+105 - Izzet Copter
+106 - Izzet Creativity
+107 - Izzet Delver
+108 - Izzet Drakes
+109 - Izzet Emerge
+110 - Izzet Narset Undoing
+111 - Izzet Phoenix
+112 - Izzet Spells
+113 - Izzet Transmogrify
+114 - Jeskai Ascendancy
+115 - Jeskai Creativity
+116 - Jeskai Cycling
+117 - Jeskai Fires
+118 - Jeskai Mentor
+119 - Jeskai Narset Undoing
+120 - Jeskai Phoenix
+121 - Jeskai Superfriends
+122 - Jeskai Transmogrify
+123 - Jeskai Vehicles
+124 - Jund Dinosaurs
+125 - Jund Land Destruction
+126 - Jund Lukka
+127 - Jund Midrange
+128 - Jund Rigging
+129 - Jund Sacrifice
+130 - Jund Transmogrify
+131 - Lotus Field Combo
+132 - Mardu Beseech Sacrifice
+133 - Mardu Doom
+134 - Mardu Greasefang
+135 - Merfolks
+136 - Metalwork Colossus
+137 - Mill
+138 - Minotaurs
+139 - Mono Black
+140 - Mono Black Devotion
+141 - Mono Blue Devotion
+142 - Mono Blue Flash
+143 - Mono Blue Mill
+144 - Mono Blue Spirits
+145 - Mono Blue Tempo
+146 - Mono Blue Wizards
+147 - Mono Green Copter
+148 - Mono Green Stompy
+149 - Mono Red Artifacts
+150 - Mono Red Fires
+151 - Mono White Artifacts
+152 - Mono White Colossus
+153 - Mono White Humans
+154 - Mono White Midrange
+155 - Naya Adventures
+156 - Naya Aggro
+157 - Naya Pia
+158 - Naya Transmogrify
+159 - Neoform
+160 - Orzhov Auras
+161 - Orzhov Greasefang
+162 - Orzhov Humans
+163 - Orzhov Midrange
+164 - Orzhov Yorion
+165 - Possibility Storm
+166 - Quintorius Combo
+167 - Rainbow Humans
+168 - Rakdos Aggro
+169 - Rakdos Anvil
+170 - Rakdos Beseech
+171 - Rakdos Copter
+172 - Rakdos Creativity
+173 - Rakdos Madness
+174 - Rakdos Midrange
+175 - Rakdos Reanimator
+176 - Rakdos Sacrifice
+177 - Rakdos Transmogrify
+178 - Red Deck Wins
+179 - Rogue
+180 - Selesnya Chord
+181 - Selesnya Company
+182 - Selesnya Counters
+183 - Selesnya Enchantments
+184 - Selesnya Midrange
+185 - Selesnya Vehicles
+186 - Simic Cauldron
+187 - Simic Flash
+188 - Simic Midrange
+189 - Song of Creation
+190 - Soulflayer Time
+191 - Storm Herald
+192 - Sultai Beanstalk
+193 - Sultai Bring to Light
+194 - Sultai Emergence
+195 - Sultai Gyruda
+196 - Sultai Rona
+197 - Sultai Toxic
+198 - Temur Adventures
+199 - Temur Marvel
+200 - Temur Phoenix
+201 - Thassa's Bargain
+202 - Vampires
+203 - Vannifar Combo
+: 153
+
+
+//----------------------------------------------------------------------
+// LANDS - 22 cards
+//----------------------------------------------------------------------
+11 Plains - Used by 25/25 decks
+4 Mutavault - Used by 25/25 decks
+3 Cavern of Souls - Used by 16/25 decks
+2 Eiganjo, Seat of the Empire - Used by 25/25 decks
+2 Castle Ardenvale - Used by 19/25 decks
+//----------------------------------------------------------------------
+// CREATURES - 34 cards
+//----------------------------------------------------------------------
+4 Recruitment Officer - Used by 25/25 decks
+4 Thalia's Lieutenant - Used by 25/25 decks
+4 Adeline, Resplendent Cathar - Used by 25/25 decks
+4 Thalia, Guardian of Thraben - Used by 25/25 decks
+4 Hopeful Initiate - Used by 24/25 decks
+4 Coppercoat Vanguard - Used by 23/25 decks
+3 Dauntless Bodyguard - Used by 24/25 decks
+3 Brutal Cathar - Used by 20/25 decks
+2 Luminarch Aspirant - Used by 13/25 decks
+1 Giant Killer - Used by 17/25 decks
+1 Kytheon, Hero of Akros - Used by 16/25 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 4 cards
+//----------------------------------------------------------------------
+2 Brave the Elements - Used by 17/25 decks
+2 Get Lost - Used by 17/25 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 15 cards
+//----------------------------------------------------------------------
+3 Wedding Announcement - Used by 24/25 decks
+3 Portable Hole - Used by 21/25 decks
+2 Get Lost - Used by 25/25 decks
+2 Rest in Peace - Used by 21/25 decks
+2 Reidane, God of the Worthy - Used by 20/25 decks
+2 Invasion of Gobakhan - Used by 10/25 decks
+1 Containment Priest - Used by 7/25 decks
 ```
