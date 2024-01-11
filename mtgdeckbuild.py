@@ -331,7 +331,7 @@ if __name__ == '__main__':
     if mtg_source[-4] == '.':
         mtg_source = mtg_source[:-4]
     top = args['top_archetypes']
-    if top < 1:
+    if top and (top < 1):
         print('argument --top-archetypes/-t: cannot be lower than 1')
         exit()
     print_with_details = args['details']
