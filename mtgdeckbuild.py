@@ -141,13 +141,15 @@ def select_archetype(mtg_source, mtg_format, top):
     return archetypes_list[archetype_choice][0]
     
 
-def print_avg_deck(avg_deck, print_with_details):
+def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
     '''
     Prints the average deck
 
     Args:
         avg_deck (dict): The average deck to print.
+        total_decks (int): The total number of analyzed decks.
         print_with_details (bool): Whether to print the decklist with more details or not.
+        maybeboard (bool): Whether to print the maybeboard or not.
     '''
 
     if print_with_details:
@@ -161,7 +163,7 @@ def print_avg_deck(avg_deck, print_with_details):
             print(f'// {section.upper()} - {nb_cards_section} cards')
             print('//----------------------------------------------------------------------')
             for card in sorted_section:
-                print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{len(decks.keys())} decks')
+                print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{total_decks} decks')
         
         # Sideboard
         sorted_side = sorted(avg_deck['side'].items(), key=lambda x: x[1], reverse=True)
@@ -172,8 +174,17 @@ def print_avg_deck(avg_deck, print_with_details):
         print(f'// SIDEBOARD - {nb_cards_side} cards')
         print('//----------------------------------------------------------------------')
         for card in sorted_side:
-            print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{len(decks.keys())} decks')
-    
+            print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{total_decks} decks')
+       
+        if maybeboard:
+            # Maybeboard
+            if 'maybeboard' in avg_deck.keys():
+                print('//----------------------------------------------------------------------')
+                print(f'// MAYBEBOARD - {len(avg_deck['maybeboard'].keys())} cards')
+                print('//----------------------------------------------------------------------')
+                for card in avg_deck['maybeboard'].keys():
+                    print(f'{avg_deck['maybeboard'][card][0]} {card} - Used by {avg_deck['maybeboard'][card][1]}/{total_decks} decks')
+
     else:
         # Main deck
         main_cards = []
@@ -188,10 +199,17 @@ def print_avg_deck(avg_deck, print_with_details):
         side_cards = []
         for card in avg_deck['side'].keys():
             side_cards.append([card, avg_deck['side'][card][0]])
-
         print('// SIDEBOARD')
         for side_card in side_cards:
             print(f'{side_card[1]} {side_card[0]}')
+        
+        if maybeboard:
+            # Maybeboard
+            if 'maybeboard' in avg_deck.keys():
+                print('// MAYBEBOARD')
+                for card in avg_deck['maybeboard'].keys():
+                    print(f'{avg_deck['maybeboard'][card][0]} {card} - Used by {avg_deck['maybeboard'][card][1]}/{total_decks} decks')
+
 
 
 def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, main_target, side_target):
@@ -211,6 +229,7 @@ def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, mai
     avg_deck = {'main': {'lands': {}, 'creatures': {}, 'other spells': {}}, 'side': {}}
 
     # Main deck building
+    main_cards = []
     if sorted_main_avg_card_counts:
         main_deck_total = 0
         n = 0
@@ -228,7 +247,26 @@ def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, mai
             else:
                 avg_deck['main'][section][card] = [delta, nb_decks]
                 main_deck_total += delta
+            main_cards.append(card)
             n += 1
+
+        # Maybeboard
+        if n < len(sorted_main_avg_card_counts):
+            nb_decks_min = nb_decks
+            nb_decks_next = sorted_main_avg_card_counts[n][1][0]
+            while ( (nb_decks_next == nb_decks_min) or (nb_decks_next == (nb_decks_min-1)) ):
+                card_count = sorted_main_avg_card_counts[n]
+                card = card_count[0]
+                nb_decks = card_count[1][0]
+                nb_cards = card_count[1][2]
+                if 'maybeboard' not in avg_deck.keys():
+                    avg_deck['maybeboard'] = {}
+                avg_deck['maybeboard'][card] = [nb_cards, nb_decks]
+                n += 1
+                if n < len(sorted_main_avg_card_counts):
+                    nb_decks_next = sorted_main_avg_card_counts[n][1][0]
+                else:
+                    break
 
     # Sideboard building
     if sorted_side_avg_card_counts:
@@ -241,13 +279,33 @@ def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, mai
             nb_cards = card_count[1][2]
             delta = side_target - side_deck_total
             # Add cards unless if we'll go over target number of cards, just reach the target so don't add the full cardset
-            if nb_cards <= delta:
-                avg_deck['side'][card] = [nb_cards, nb_decks]
-                side_deck_total += nb_cards
-            else:
-                avg_deck['side'][card] = [delta, nb_decks]
-                side_deck_total += delta
+            if card not in main_cards:
+                if nb_cards <= delta:
+                    avg_deck['side'][card] = [nb_cards, nb_decks]
+                    side_deck_total += nb_cards
+                else:
+                    avg_deck['side'][card] = [delta, nb_decks]
+                    side_deck_total += delta
             n += 1
+        
+        # Maybeboard
+        if n < len(sorted_main_avg_card_counts):
+            nb_decks_min = nb_decks
+            nb_decks_next = sorted_main_avg_card_counts[n][1][0]
+            while ( (nb_decks_next == nb_decks_min) or (nb_decks_next == (nb_decks_min-1)) ):
+                card_count = sorted_main_avg_card_counts[n]
+                card = card_count[0]
+                nb_decks = card_count[1][0]
+                nb_cards = card_count[1][2]
+                if card not in main_cards:
+                    if 'maybeboard' not in avg_deck.keys():
+                        avg_deck['maybeboard'] = {}
+                    avg_deck['maybeboard'][card] = [nb_cards, nb_decks]
+                n += 1
+                if n < len(sorted_main_avg_card_counts):
+                    nb_decks_next = sorted_main_avg_card_counts[n][1][0]
+                else:
+                    break
     
     return avg_deck
 
@@ -274,7 +332,15 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--details', '-d',
+        '--decks', '-d',
+        type = int,
+        action = 'store',
+        default = 25,
+        help = 'The maximum number of decks to analyze (default: 25)'
+    )
+
+    parser.add_argument(
+        '--print-details', '-p',
         action = 'store_true',
         help = 'Print deck with details: sections and number of decks using each card'
     )
@@ -321,6 +387,13 @@ if __name__ == '__main__':
         help = 'Only consider decks from the last given months (only for MTGTOP8)'
     )
 
+    parser.add_argument(
+        '--maybeboard',
+        action = 'store_true',
+        default = False,
+        help = 'Print Maybeboard (additional cards that are tied or minus one in terms of number of decks using them)'
+    )
+
     args = vars(parser.parse_args())
 
     mtg_source = args['website_source']
@@ -334,7 +407,11 @@ if __name__ == '__main__':
     if top and (top < 1):
         print('argument --top-archetypes/-t: cannot be lower than 1')
         exit()
-    print_with_details = args['details']
+    max_number_decks = args['decks']
+    if max_number_decks and (max_number_decks < 1):
+        print('argument --decks/-d: cannot be lower than 1')
+        exit()
+    print_with_details = args['print_details']
     competitive = args['competitive_only']
     if competitive and mtg_source == 'mtgdecks':
         print('argument --competitive-only/-c: cannot be used with website data source MTGDECKS')
@@ -371,7 +448,8 @@ if __name__ == '__main__':
     if last_months and (last_months < 1):
         print('argument --last-months/-l: must be a positive number')
         exit()
-    
+    maybeboard = args['maybeboard']
+
     mtg_format = select_format(mtg_source)
     mtg_archetype = select_archetype(mtg_source, mtg_format, top)
 
@@ -379,106 +457,118 @@ if __name__ == '__main__':
     decks = {}
 
     if mtg_source == 'mtgtop8':
-        deck_search_str = f'current_page=&format={mtg_format}&archetype_sel%5B{mtg_format}%5D={mtg_archetype}'
-        if competitive:
-            deck_search_str += '&compet_check%5BP%5D=1&compet_check%5BM%5D=1&compet_check%5BC%5D=1'
-        if deck_name:
-            deck_search_str += f'&deck_titre={deck_name}'
-        if (main_include or side_include):
-            if main_include:
-                deck_search_str += '&MD_check=1'
-            if side_include:
-                deck_search_str += '&SB_check=1'
-            deck_search_str += f'&cards={quote(included_cards)}'
-        if last_months:
-            date_str = (datetime.now()-timedelta(days=30*last_months)).strftime('%d/%m/%Y').replace('/', '%2F')
-            deck_search_str += f'&date_start={date_str}'
-        response = post(f'{mtgtop8_base_url}/search', data=deck_search_str, headers={'referer': f'{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})
-        compare_str = 'checkall=1'
 
-        if 'O decks matching' in response.text:
-            print('No matching decks.')
-            exit()
-        soup = BeautifulSoup(response.text, 'html.parser')
-        links = soup.find_all('input')
-        n = 1
-        # Get deck references
-        for link in links:
-            try:
-                value = int(link.attrs['value'])
-                if value != 1:
-                    value_str = link.attrs['value']
-                    compare_str += f'&deck_check%5B{n}%5D=1&deck_ref%5B{n}%5D={value_str}'
-                    n += 1
-            except Exception:
-                pass
+        n_page = 1
+        while len(decks.keys()) < max_number_decks:
 
-        # Deck comparison
-        deck_section = ''
-        card_count_regex = compile('<div class="c">([1-9]{0,2})</div>')
-        
-        # Deck comparison to get all the cards
-        response = post(f'{mtgtop8_base_url}/compare', data = compare_str, headers={'referer': '{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})   
-        soup = BeautifulSoup(response.text, 'html.parser') # Parse the HTML content
-        links = soup.find_all('a') # Find all the links on the page
+            deck_search_str = f'current_page={n_page}&format={mtg_format}&archetype_sel%5B{mtg_format}%5D={mtg_archetype}'
+            if competitive:
+                deck_search_str += '&compet_check%5BP%5D=1&compet_check%5BM%5D=1&compet_check%5BC%5D=1'
+            if deck_name:
+                deck_search_str += f'&deck_titre={deck_name}'
+            if (main_include or side_include):
+                if main_include:
+                    deck_search_str += '&MD_check=1'
+                if side_include:
+                    deck_search_str += '&SB_check=1'
+                deck_search_str += f'&cards={quote(included_cards)}'
+            if last_months:
+                date_str = (datetime.now()-timedelta(days=30*last_months)).strftime('%d/%m/%Y').replace('/', '%2F')
+                deck_search_str += f'&date_start={date_str}'
+            response = post(f'{mtgtop8_base_url}/search', data=deck_search_str, headers={'referer': f'{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})
+            compare_str = 'checkall=1'
 
-        # Discover the decks
-        for link in links:
-            href = link.get('href')
-            if href:
-                href = href.lower()
-                if href.startswith('event?e='):
-                    deck_id = href.split('&d=')[1]
-                    # Create the deck
-                    decks[deck_id] = {'main': {}, 'side': {}}
+            if 'O decks matching' in response.text:
+                print('No matching decks.')
+                exit()
+            soup = BeautifulSoup(response.text, 'html.parser')
+            links = soup.find_all('input')
+            n = 1
+            # Get deck references
+            for link in links:
+                try:
+                    value = int(link.attrs['value'])
+                    if value != 1:
+                        value_str = link.attrs['value']
+                        if (len(decks.keys()) + n) <= max_number_decks: # Stop before reaching the max number of decks to analyze      
+                            compare_str += f'&deck_check%5B{n}%5D=1&deck_ref%5B{n}%5D={value_str}'
+                            n += 1
+                except Exception:
+                    pass
 
-        # Parse the table of decks and cards
-        table = soup.find_all('table')
-        if table:
-            table = table[-1]
-            rows = table.find_all('tr')
-            deck_part = 'main'
+            if compare_str == 'checkall=1': # No more decks available
+                break
+
+            # Deck comparison
             deck_section = ''
+            card_count_regex = compile('<div class="c">([1-9]{0,2})</div>')
+            
+            # Deck comparison to get all the cards
+            response = post(f'{mtgtop8_base_url}/compare', data = compare_str, headers={'referer': '{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})   
+            soup = BeautifulSoup(response.text, 'html.parser') # Parse the HTML content
+            links = soup.find_all('a') # Find all the links on the page
 
-            for row in rows:
-                cols = row.find_all('td')
-                card = ''
-                for col in cols:
-                    if col:
-                        # Detect sections
-                        if col.text == 'LANDS':
-                            deck_section = 'lands'
-                            deck_part = 'main'
-                        elif col.text == 'CREATURES':
-                            deck_section = 'creatures'
-                            deck_part = 'main'
-                        elif col.text == 'OTHER SPELLS':
-                            deck_section = 'other spells'
-                            deck_part = 'main'
-                        elif col.text == 'SIDEBOARDS':
-                            deck_section = 'sideboard'
-                            deck_part = 'side'
-                        # Discover cards
-                        card_name = col.find('div', {'class': 'c2'})
-                        if card_name:
-                            if card_name.text:
-                                card = card_name.text
-                                deck_iter = iter(decks)
-                        # Discover card counts
-                        card_counts = card_count_regex.findall(str(col))
-                        for card_count in card_counts:
-                            # Iterate over decks
-                            current_deck = next(deck_iter)
-                            # Add card to deck if counted in the deck     
-                            if card_count:
-                                quantity=int(card_count)
-                                decks[current_deck][deck_part][card] = [quantity, deck_section] # A card is added with a quantity and the righ section
+            # Discover the decks
+            current_decks = {}
+            for link in links:
+                href = link.get('href')
+                if href:
+                    href = href.lower()
+                    if href.startswith('event?e='):
+                        deck_id = href.split('&d=')[1]
+                        # Create the deck
+                        current_decks[deck_id] = {'main': {}, 'side': {}}
+
+            # Parse the table of decks and cards
+            table = soup.find_all('table')
+            if table:
+                table = table[-1]
+                rows = table.find_all('tr')
+                deck_part = 'main'
+                deck_section = ''
+
+                for row in rows:
+                    cols = row.find_all('td')
+                    card = ''
+                    for col in cols:
+                        if col:
+                            # Detect sections
+                            if col.text == 'LANDS':
+                                deck_section = 'lands'
+                                deck_part = 'main'
+                            elif col.text == 'CREATURES':
+                                deck_section = 'creatures'
+                                deck_part = 'main'
+                            elif col.text == 'OTHER SPELLS':
+                                deck_section = 'other spells'
+                                deck_part = 'main'
+                            elif col.text == 'SIDEBOARDS':
+                                deck_section = 'sideboard'
+                                deck_part = 'side'
+                            # Discover cards
+                            card_name = col.find('div', {'class': 'c2'})
+                            if card_name:
+                                if card_name.text:
+                                    card = card_name.text
+                                    deck_iter = iter(current_decks)
+                            # Discover card counts
+                            card_counts = card_count_regex.findall(str(col))
+                            for card_count in card_counts:
+                                # Iterate over decks
+                                current_deck = next(deck_iter)
+                                # Add card to deck if counted in the deck     
+                                if card_count:
+                                    quantity=int(card_count)
+                                    current_decks[current_deck][deck_part][card] = [quantity, deck_section] # A card is added with a quantity and the righ section
+            
+            decks = decks | current_decks
+            n_page += 1
 
     elif mtg_source == 'mtgdecks':
         deck_links = []
         reached_target_nb_decks = False
+        previous_first_link = ''
         n = 1
-        previous_href = ''
         while not reached_target_nb_decks:
             deck_search_str = ''
             if (main_include or side_include):
@@ -496,20 +586,24 @@ if __name__ == '__main__':
             links = soup.find_all('a')
             for link in links:
                 href = link.get('href')
+                if ('-decklist-by-' in href):
+                    first_link = link
+                    break
+            if first_link == previous_first_link:
+                reached_target_nb_decks = True
+                break
+            for link in links:
+                href = link.get('href')
                 # Discover the decks
                 if href:
-                    if len(deck_links) < 25:
+                    if len(deck_links) < max_number_decks:
                         if ('-decklist-by-' in href):
-                            if href == previous_href:
-                                reached_target_nb_decks = True
                             if f'{mtgdecks_base_url}{href}' not in deck_links:
                                 deck_links.append(f'{mtgdecks_base_url}{href}')
-                            previous_href = href
                     else:
                         reached_target_nb_decks = True
+            previous_first_link = first_link
             n += 1
-            if n >= 5:
-                reached_target_nb_decks = True
         for deck_link in deck_links:
             # Create the deck
             decks[deck_link[-7:]] = {'main': {}, 'side': {}}
@@ -648,4 +742,4 @@ if __name__ == '__main__':
     avg_deck = build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, main_target, side_target)
 
     print('\n')
-    print_avg_deck(avg_deck, print_with_details)
+    print_avg_deck(avg_deck, len(decks.keys()), print_with_details, maybeboard)
