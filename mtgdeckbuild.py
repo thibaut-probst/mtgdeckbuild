@@ -5,19 +5,15 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from re import compile, match
-
+from Levenshtein import distance as lev
 
 mtgtop8_base_url = 'https://mtgtop8.com'
-mtgdecks_base_url = 'https://mtgdecks.net'
 user_agent = {'User-agent': 'Mozilla/5.0'}
 
 
-def select_format(mtg_source):
+def select_format():
     '''
     Parses the website data source website to identify the available Magic: The Gathering formats and prompts the user to select a format.
-
-    Args:
-        mtg_source (str): The Magic: The Gathering website data source.
 
     Returns:
         The selected Magic: The Gathering format.
@@ -26,36 +22,25 @@ def select_format(mtg_source):
     # Format discovery
     format_choice_str = 'Select a format:\n'
     mtg_formats = {}
-    if mtg_source == 'mtgtop8':
-        response = get(f'{mtgtop8_base_url}', headers=user_agent)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        links = soup.find_all('a')
-        n = 1
-        for link in links:
-            href = link.get('href')
-            if href:
-                if href.startswith('/format?f='):
-                    mtg_formats[n] = href.split('=')[1]
-                    if link.text.lower() == 'cedh':
-                        format_choice_str += f'{n} - cEDH\n'
-                    else:
-                        format_choice_str += f'{n} - {link.text.title()}\n'
-                    n += 1
-    elif mtg_source == 'mtgdecks':
-        response = get(f'{mtgdecks_base_url}', headers=user_agent)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        strongs = soup.find_all('strong')
-        n = 1
-        for strong in strongs:
-            if strong.text.startswith('\xa0'):
-                mtg_formats[n] = strong.text[2:]
-                format_choice_str += f'{n} - {strong.text[2:].title()}\n'
+    response = get(f'{mtgtop8_base_url}', headers=user_agent)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    links = soup.find_all('a')
+    n = 1
+    for link in links:
+        href = link.get('href')
+        if href:
+            if href.startswith('/format?f='):
+                mtg_formats[n] = href.split('=')[1]
+                if link.text.lower() == 'cedh':
+                    format_choice_str += f'{n} - cEDH\n'
+                else:
+                    format_choice_str += f'{n} - {link.text.title()}\n'
                 n += 1
 
     # Format choice
     format_choice = 0
     while format_choice == 0:
-        format_choice = Prompt.ask(format_choice_str, choices=[f'{n}' for n in mtg_formats.keys()], show_choices=False)
+        format_choice = Prompt.ask(format_choice_str, choices=[f'{n}' for n in mtg_formats], show_choices=False)
         try:
             format_choice = int(format_choice)
             if format_choice == 0:
@@ -66,53 +51,35 @@ def select_format(mtg_source):
     return mtg_formats[format_choice]
 
 
-def select_archetype(mtg_source, mtg_format, top):
+def select_archetypes(mtg_format, top):
     '''
     Parses the website data source to identify the available Magic: The Gathering archetypes of a given format and prompts the user to select an archetype.
     
     Args:
-        mtg_source (str): The Magic: The Gathering website data source.
         mtg_format (str): The Magic: The Gathering format.
         top (int): The number of top archetypes to select.
 
     Returns:
-        The selected Magic: The Gathering archetype.
+        The selected Magic: The Gathering archetypes.
     '''
 
     # Archetypes discovery
     archetypes_list = []
     
-    if mtg_source == 'mtgtop8':
+    if mtg_format == 'EDH':
+        response = get(f'{mtgtop8_base_url}/cEDH_decks?format?f={mtg_format}&meta=121', headers=user_agent)
+    else:
         response = get(f'{mtgtop8_base_url}/format?f={mtg_format}', headers=user_agent)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        links = soup.find_all('a')
-        for link in links:
-            href = link.get('href')
-            txt = link.text
-            if href and txt:
-                href = href.lower()
-                # Only keep deck archetypes
-                if href.startswith('archetype?a='):
-                    archetypes_list.append((href.split('archetype?a=')[1].split('&')[0], txt))
-    elif mtg_source == 'mtgdecks':
-        response = get(f'{mtgdecks_base_url}/{mtg_format}', headers=user_agent)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        links = soup.find_all('a')
-        for link in links:
-            href = link.get('href')
-            txt = link.text
-            if href and txt:
-                href = href.lower()
-                # Only keep deck archetypes
-                if ( href.startswith(f'{mtgdecks_base_url}/{mtg_format.lower()}/') or href.startswith(f'/{mtg_format.lower()}/') ) \
-                    and ('/rotation-what-is-in-' not in href) \
-                        and ('/staples' not in href) \
-                            and ('/winrates' not in href) \
-                                and ('/tournaments' not in href) \
-                                    and ('/metagame' not in href):
-                    if not href.startswith(f'{mtgdecks_base_url}/'):
-                        href = f'{mtgdecks_base_url}{href}'
-                    archetypes_list.append((href, txt))
+    soup = BeautifulSoup(response.text, 'html.parser')
+    links = soup.find_all('a')
+    for link in links:
+        href = link.get('href')
+        txt = link.text
+        if href and txt:
+            href = href.lower()
+            # Only keep deck archetypes
+            if href.startswith('archetype?a='):
+                archetypes_list.append((href.split('archetype?a=')[1].split('&')[0], txt))
 
     if top > 0:
         archetypes_list = sorted(archetypes_list[0:top], key=lambda x: x[1])
@@ -122,23 +89,92 @@ def select_archetype(mtg_source, mtg_format, top):
     # Archetypes choice
     archetypes_dict = {}
     archetype_choice_str = 'Select an archetype:\n'
+    archetype_choice_str += '0 - All archetypes\n'
+    archetypes_dict[0] = 'All archetypes'
+
     n = 0
+
     for a in archetypes_list:
         archetypes_dict[n] = a[1]
         archetype_choice_str += f'{n+1} - {a[1]}\n'
         n += 1
-
-    archetype_choice = 0
-    while archetype_choice == 0:
-        archetype_choice = Prompt.ask(archetype_choice_str, choices=[f'{n+1}' for n in archetypes_dict.keys()], show_choices=False)
+    selected_archetypes = []
+    while not selected_archetypes:
+        archetype_choices = Prompt.ask(archetype_choice_str, show_choices=False)
         try:
-            archetype_choice = int(archetype_choice) - 1
-            if archetype_choice == 0:
-                print('Invalid choice.')
+            archetype_choices = archetype_choices.split(',')
+            for choice in archetype_choices:
+                choice = int(choice)
+                if choice == 0:
+                    selected_archetypes = [0]
+                else:
+                    if choice > 0:
+                        choice = choice - 1
+                        selected_archetypes.append(archetypes_list[choice][0])
+                    elif choice < 0:
+                        print('Invalid choice.')
+            if not selected_archetypes:
+                print('Invalid choice.')              
         except Exception:
             print('Invalid choice.')
 
-    return archetypes_list[archetype_choice][0]
+    if 0 in selected_archetypes:
+        return False
+
+    return selected_archetypes
+
+
+def find_archetype(mtg_format, archetype_name):
+    '''
+    Parses the website data source to find the Magic: The Gathering archetype identifier based on the provided name.
+    
+    Args:
+        archetype_name (str): The Magic: The Gathering archetype name.
+
+    Returns:
+        The found Magic: The Gathering archetype identifier.
+    '''
+
+    archetype_id = False
+
+    # Archetypes discovery
+    archetypes = {}
+
+    if mtg_format == 'EDH':
+        response = get(f'{mtgtop8_base_url}/cEDH_decks?format?f={mtg_format}&meta=121', headers=user_agent)
+    else:
+        response = get(f'{mtgtop8_base_url}/format?f={mtg_format}', headers=user_agent)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    links = soup.find_all('a')
+    for link in links:
+        href = link.get('href')
+        txt = link.text
+        if href and txt:
+            href = href.lower()
+            # Only keep deck archetypes
+            if href.startswith('archetype?a='):
+                archetypes[txt.lower()] = href.split('archetype?a=')[1].split('&')[0]
+
+    archetype_name_lower = archetype_name.lower()
+
+    # Try to find archetype with Leveinshtein distance or if provided archetype string is the start of a known one
+    if archetype_name_lower not in archetypes:
+        print(f'Archetype not found: {archetype_name}')
+        for a in archetypes:
+            a_lower = a.lower()
+            dist = lev(archetype_name_lower, a)
+            if (dist <= 3) or (a_lower.startswith(archetype_name_lower) and (len(archetype_name_lower) >= 5)):
+                answer = Prompt.ask(f'Did you mean {a.title()}?', choices=['y', 'n'], default='y')
+                if answer.lower() == 'y':
+                    archetype_name_lower = a_lower
+                    break
+
+    if archetype_name_lower not in archetypes:
+        exit()
+
+    archetype_id = archetypes[archetype_name_lower]
+
+    return archetype_id
     
 
 def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
@@ -154,7 +190,7 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
 
     if print_with_details:
         # Main deck
-        for section in avg_deck['main'].keys():
+        for section in avg_deck['main']:
             sorted_section = sorted(avg_deck['main'][section].items(), key=lambda x: x[1], reverse=True)
             nb_cards_section = 0
             for card in sorted_section:
@@ -178,18 +214,18 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
        
         if maybeboard:
             # Maybeboard
-            if 'maybeboard' in avg_deck.keys():
+            if 'maybeboard' in avg_deck:
                 print('//----------------------------------------------------------------------')
-                print(f'// MAYBEBOARD - {len(avg_deck['maybeboard'].keys())} cards')
+                print(f'// MAYBEBOARD - {len(avg_deck['maybeboard'])} cards')
                 print('//----------------------------------------------------------------------')
-                for card in avg_deck['maybeboard'].keys():
+                for card in avg_deck['maybeboard']:
                     print(f'{avg_deck['maybeboard'][card][0]} {card} - Used by {avg_deck['maybeboard'][card][1]}/{total_decks} decks')
 
     else:
         # Main deck
         main_cards = []
-        for section in avg_deck['main'].keys():
-            for card in avg_deck['main'][section].keys():
+        for section in avg_deck['main']:
+            for card in avg_deck['main'][section]:
                 main_cards.append([card, avg_deck['main'][section][card][0]])
         print('// MAIN DECK')
         for main_card in main_cards:
@@ -197,7 +233,7 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
 
         # Sideboard
         side_cards = []
-        for card in avg_deck['side'].keys():
+        for card in avg_deck['side']:
             side_cards.append([card, avg_deck['side'][card][0]])
         print('// SIDEBOARD')
         for side_card in side_cards:
@@ -205,23 +241,24 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
         
         if maybeboard:
             # Maybeboard
-            if 'maybeboard' in avg_deck.keys():
+            if 'maybeboard' in avg_deck:
                 print('// MAYBEBOARD')
-                for card in avg_deck['maybeboard'].keys():
-                    print(f'{avg_deck['maybeboard'][card][0]} {card} - Used by {avg_deck['maybeboard'][card][1]}/{total_decks} decks')
+                for card in avg_deck['maybeboard']:
+                    print(f'{avg_deck['maybeboard'][card][0]} {card}')
 
 
 
-def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, main_target, side_target):
+def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target, side_target, nb_analyzed_decks):
     '''
     Builds an average deck based on the provided average card counts.
 
     Args:
-        sorted_main_avg_card_counts (list): A sorted list of average card counts for the main deck. Each item in the list is a tuple of (card, [count, decks, section]).
-        sorted_side_avg_card_counts (list): A sorted list of average card counts for the sideboard. Each item in the list is a tuple of (card, [count, decks, section]).
+        sorted_main_card_counts (list): A sorted list of (average or top quantity) card counts for the main deck. Each item in the list is a tuple of (card, [count, decks, section]).
+        sorted_side_card_counts (list): A sorted list of (average or top quantity) card counts for the sideboard. Each item in the list is a tuple of (card, [count, decks, section]).
         main_target (int): The target number of cards for the main deck.
         side_target (int): The target number of cards for the sideboard.
-
+        nb_analyzed_decks (int): The total number of analyzed decks.
+        
     Returns:
         A dictionary representing the average deck.
     '''
@@ -230,11 +267,11 @@ def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, mai
 
     # Main deck building
     main_cards = []
-    if sorted_main_avg_card_counts:
+    if sorted_main_card_counts:
         main_deck_total = 0
         n = 0
         while not (main_deck_total == main_target): # Process while we haven't reached the target
-            card_count = sorted_main_avg_card_counts[n]
+            card_count = sorted_main_card_counts[n]
             card = card_count[0]
             nb_decks = card_count[1][0]
             nb_cards = card_count[1][2]
@@ -251,29 +288,29 @@ def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, mai
             n += 1
 
         # Maybeboard
-        if n < len(sorted_main_avg_card_counts):
+        if n < len(sorted_main_card_counts):
             nb_decks_min = nb_decks
-            nb_decks_next = sorted_main_avg_card_counts[n][1][0]
-            while ( (nb_decks_next == nb_decks_min) or (nb_decks_next == (nb_decks_min-1)) ):
-                card_count = sorted_main_avg_card_counts[n]
+            nb_decks_next = sorted_main_card_counts[n][1][0]
+            while ( (nb_decks_next == nb_decks_min) or (nb_decks_next >= (nb_decks_min-round(nb_analyzed_decks/5))) ):
+                card_count = sorted_main_card_counts[n]
                 card = card_count[0]
                 nb_decks = card_count[1][0]
                 nb_cards = card_count[1][2]
-                if 'maybeboard' not in avg_deck.keys():
+                if 'maybeboard' not in avg_deck:
                     avg_deck['maybeboard'] = {}
                 avg_deck['maybeboard'][card] = [nb_cards, nb_decks]
                 n += 1
-                if n < len(sorted_main_avg_card_counts):
-                    nb_decks_next = sorted_main_avg_card_counts[n][1][0]
+                if n < len(sorted_main_card_counts):
+                    nb_decks_next = sorted_main_card_counts[n][1][0]
                 else:
                     break
 
     # Sideboard building
-    if sorted_side_avg_card_counts:
+    if sorted_side_card_counts:
         side_deck_total = 0
         n = 0
         while not (side_deck_total == side_target): # Process while we haven't reached the target
-            card_count = sorted_side_avg_card_counts[n]
+            card_count = sorted_side_card_counts[n]
             card = card_count[0]
             nb_decks = card_count[1][0]
             nb_cards = card_count[1][2]
@@ -287,25 +324,6 @@ def build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, mai
                     avg_deck['side'][card] = [delta, nb_decks]
                     side_deck_total += delta
             n += 1
-        
-        # Maybeboard
-        if n < len(sorted_main_avg_card_counts):
-            nb_decks_min = nb_decks
-            nb_decks_next = sorted_main_avg_card_counts[n][1][0]
-            while ( (nb_decks_next == nb_decks_min) or (nb_decks_next == (nb_decks_min-1)) ):
-                card_count = sorted_main_avg_card_counts[n]
-                card = card_count[0]
-                nb_decks = card_count[1][0]
-                nb_cards = card_count[1][2]
-                if card not in main_cards:
-                    if 'maybeboard' not in avg_deck.keys():
-                        avg_deck['maybeboard'] = {}
-                    avg_deck['maybeboard'][card] = [nb_cards, nb_decks]
-                n += 1
-                if n < len(sorted_main_avg_card_counts):
-                    nb_decks_next = sorted_main_avg_card_counts[n][1][0]
-                else:
-                    break
     
     return avg_deck
 
@@ -316,14 +334,6 @@ if __name__ == '__main__':
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
 
     parser.add_argument(
-        '--website-source', '-w',
-        type = str,
-        action = 'store',
-        default = 'mtgtop8',
-        help = 'Website data source to use (mtgtop8 or mtgdecks ; default: mtgtop8)'
-    )
-
-    parser.add_argument(
         '--top-archetypes', '-t',
         type = int,
         action = 'store',
@@ -332,10 +342,26 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
+        '--format', '-f',
+        type = str,
+        action = 'store',
+        default = '',
+        help = 'The format to analyze (default: interactive mode)'
+    )
+    
+    parser.add_argument(
+        '--archetype', '-a',
+        type = str,
+        action = 'store',
+        default = '',
+        help = 'The archetype to analyze (default: interactive mode, must be used along with --format/-f)'
+    )
+
+    parser.add_argument(
         '--decks', '-d',
         type = int,
         action = 'store',
-        default = 25,
+        default = 20,
         help = 'The maximum number of decks to analyze (default: 25)'
     )
 
@@ -349,14 +375,14 @@ if __name__ == '__main__':
         '--competitive-only', '-c',
         action = 'store_true',
         default = False,
-        help = 'Only consider competitive decks (only for MTGTOP8)'
+        help = 'Only consider competitive decks'
     )
 
     parser.add_argument(
         '--name', '-n',
         type = str,
         action='store',
-        help = 'Only consider decks including given deck name (only for MTGTOP8)'
+        help = 'Only consider decks including given deck name'
     )
 
     parser.add_argument(
@@ -370,7 +396,7 @@ if __name__ == '__main__':
         '--main-include', '-m',
         action = 'store_true',
         default = False,
-        help = 'Consider cards to include for the main deck (must be used with --include-cards/-i, also include cards for the sideboard for MTGDECKS)'
+        help = 'Consider cards to include for the main deck (must be used with --include-cards/-i)'
     )
 
     parser.add_argument(
@@ -384,7 +410,14 @@ if __name__ == '__main__':
         '--last-months', '-l',
         type = int,
         action='store',
-        help = 'Only consider decks from the last given months (only for MTGTOP8)'
+        help = 'Only consider decks from the last given months'
+    )
+
+    parser.add_argument(
+        '--top-quantity', '-T',
+        action = 'store_true',
+        default = False,
+        help = 'Build average deck based on the top used quantity for each most used card in analyzed decks (default: based on the average quantity)'
     )
 
     parser.add_argument(
@@ -395,73 +428,99 @@ if __name__ == '__main__':
     )
 
     args = vars(parser.parse_args())
-
-    mtg_source = args['website_source']
-    allowed_sources = ['mtgtop8', 'mtgtop8.com', 'mtgdecks', 'mtgdecks.net']
-    if mtg_source.lower() not in allowed_sources:
-        print(f'{mtg_source} is not a supported source')
-        exit()
-    if mtg_source[-4] == '.':
-        mtg_source = mtg_source[:-4]
     top = args['top_archetypes']
     if top and (top < 1):
         print('argument --top-archetypes/-t: cannot be lower than 1')
         exit()
+    
+    input_format = args['format']
+    mtg_format = input_format.upper()
+    allowed_formats = ['ST', 'STD', 'STANDARD', 'PI', 'PIONEER', 'MO', 'MODERN', 'LE', 'LEGACY', 'VI', 'VINTAGE', \
+                       'PAU', 'PAUPER', 'cEDH', 'COMMANDER', 'DC', 'EDH', 'DUELCOMMANDER', 'DUEL COMMANDER', 'PREM', 'PREMODERN']
+    if mtg_format:
+        if mtg_format not in allowed_formats:
+            print(f'{input_format} is not in the list of supported formats.')
+            exit()
+        else:
+            if (mtg_format == 'PAUPER'):
+                mtg_format = 'PAU'
+            elif (mtg_format == 'COMMANDER'):
+                mtg_format = 'cEDH'
+            elif (mtg_format == 'DC') or (mtg_format == 'EDH') or mtg_format.startswith('DUEL'):
+                mtg_format = 'EDH'
+            elif (mtg_format == 'PREMODERN'):
+                mtg_format = 'PREM'
+            else:
+                mtg_format = mtg_format[0:2]
+    archetype = args['archetype']
+    if archetype and not format:
+        print('argument --archetype/-a: must be used along with --format/-f')
+        exit()
+
     max_number_decks = args['decks']
     if max_number_decks and (max_number_decks < 1):
         print('argument --decks/-d: cannot be lower than 1')
         exit()
+
     print_with_details = args['print_details']
+
     competitive = args['competitive_only']
-    if competitive and mtg_source == 'mtgdecks':
-        print('argument --competitive-only/-c: cannot be used with website data source MTGDECKS')
-        exit()
+
     deck_name = args['name']
-    if deck_name and mtg_source == 'mtgdecks':
-        print('argument --name/-n: cannot be used with website data source MTGDECKS')
-        exit()
+
     included_cards = args['include_cards']
     if included_cards:
         if not match(r'^[\w\s\',]+(-[\w\s\', ]+)?$', included_cards):
             print('argument --include-cards/-i: must be a dash-separated list of strings')
             exit()
         else:
-            if mtg_source == 'mtgtop8':
-                included_cards = included_cards.replace(' - ', '\r\n')
-                included_cards = included_cards.replace('-', '\r\n')
-                included_cards = included_cards.replace('- ', '\r\n')
-                included_cards = included_cards.replace(' -', '\r\n')
-            elif mtg_source == 'mtgdecks':
-                included_cards = included_cards.replace(' - ', ';')
-                included_cards = included_cards.replace('-', ';')
-                included_cards = included_cards.replace('- ', ';')
-                included_cards = included_cards.replace(' -', ';')
+            included_cards = included_cards.replace(' - ', '\r\n')
+            included_cards = included_cards.replace('-', '\r\n')
+            included_cards = included_cards.replace('- ', '\r\n')
+            included_cards = included_cards.replace(' -', '\r\n')
     main_include = args['main_include']
     side_include = args['side_include']
     if (included_cards and not (main_include or side_include)) or (not included_cards and (main_include or side_include)):
         print('argument --include-cards/-i: must be used along with --main-include/-m and/or --side-include/-s')
         exit()
+
     last_months = args['last_months']
-    if last_months and mtg_source == 'mtgdecks':
-        print('argument --last-months/-l: cannot be used with website data source MTGDECKS')
-        exit()
     if last_months and (last_months < 1):
         print('argument --last-months/-l: must be a positive number')
         exit()
+    elif last_months:
+        max_number_decks = 10000000
+
+    top_method = args['top_quantity']
     maybeboard = args['maybeboard']
 
-    mtg_format = select_format(mtg_source)
-    mtg_archetype = select_archetype(mtg_source, mtg_format, top)
+    if not mtg_format:
+        mtg_format = select_format()
+
+    if archetype:
+        mtg_archetype = find_archetype(mtg_format, archetype)
+        mtg_archetypes = [mtg_archetype]
+    else:
+        mtg_archetypes = select_archetypes(mtg_format, top)
+        if not mtg_archetypes:
+            mtg_archetypes = [0]
 
     # Deck search
     decks = {}
 
-    if mtg_source == 'mtgtop8':
+    # Max number of decks is split per archetypes
+    max_number_decks_archetype = int((max_number_decks/len(mtg_archetypes)) // 1 + (1 if (max_number_decks/len(mtg_archetypes)) % 1 != 0 else 0))
+
+    for mtg_archetype in mtg_archetypes:
 
         n_page = 1
-        while len(decks.keys()) < max_number_decks:
+        deck = {}
 
-            deck_search_str = f'current_page={n_page}&format={mtg_format}&archetype_sel%5B{mtg_format}%5D={mtg_archetype}'
+        while len(deck) < max_number_decks_archetype:
+            if not mtg_archetypes:
+                deck_search_str = f'current_page={n_page}&format={mtg_format}'
+            else:
+                deck_search_str = f'current_page={n_page}&format={mtg_format}&archetype_sel%5B{mtg_format}%5D={mtg_archetype}'
             if competitive:
                 deck_search_str += '&compet_check%5BP%5D=1&compet_check%5BM%5D=1&compet_check%5BC%5D=1'
             if deck_name:
@@ -478,9 +537,14 @@ if __name__ == '__main__':
             response = post(f'{mtgtop8_base_url}/search', data=deck_search_str, headers={'referer': f'{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})
             compare_str = 'checkall=1'
 
-            if 'O decks matching' in response.text:
+            decks_matching_regex = compile('<div class=w_title align=center>([0-9]+) decks matching<div class=c_tl></div>')
+            deck_count = int(decks_matching_regex.findall(response.text)[0])
+            if deck_count == 0:
                 print('No matching decks.')
                 exit()
+            elif deck_count < 25 and (deck_count < max_number_decks_archetype):
+                max_number_decks_archetype = deck_count
+
             soup = BeautifulSoup(response.text, 'html.parser')
             links = soup.find_all('input')
             n = 1
@@ -490,7 +554,7 @@ if __name__ == '__main__':
                     value = int(link.attrs['value'])
                     if value != 1:
                         value_str = link.attrs['value']
-                        if (len(decks.keys()) + n) <= max_number_decks: # Stop before reaching the max number of decks to analyze      
+                        if (len(deck) + n) <= max_number_decks: # Stop before reaching the max number of decks to analyze      
                             compare_str += f'&deck_check%5B{n}%5D=1&deck_ref%5B{n}%5D={value_str}'
                             n += 1
                 except Exception:
@@ -551,117 +615,49 @@ if __name__ == '__main__':
                                 if card_name.text:
                                     card = card_name.text
                                     deck_iter = iter(current_decks)
+                                    deck_cpt = 0
                             # Discover card counts
                             card_counts = card_count_regex.findall(str(col))
-                            for card_count in card_counts:
+                            if card_counts and (deck_cpt < max_number_decks_archetype):
+                                card_count = card_counts[0]
                                 # Iterate over decks
                                 current_deck = next(deck_iter)
-                                # Add card to deck if counted in the deck     
+                                # Add card to deck if counted in the deck
                                 if card_count:
                                     quantity=int(card_count)
                                     current_decks[current_deck][deck_part][card] = [quantity, deck_section] # A card is added with a quantity and the righ section
-            
-            decks = decks | current_decks
+                                deck_cpt += 1
+                                
+            deck = deck | current_decks
             n_page += 1
 
-    elif mtg_source == 'mtgdecks':
-        deck_links = []
-        reached_target_nb_decks = False
-        previous_first_link = ''
-        n = 1
-        while not reached_target_nb_decks:
-            deck_search_str = ''
-            if (main_include or side_include):
-                deck_search_str += 'cards:'
-                for card in included_cards.split(';'):
-                    if side_include:
-                        deck_search_str += f'SB:{quote(card)}{quote(';')}'
-                    if main_include:
-                        deck_search_str += f'{quote(card)}{quote(';')}'
-                    deck_search_str = deck_search_str[0:-3]
-            response = get(f'{mtg_archetype}/page:{n}/{deck_search_str}', headers=user_agent)
-            if 'NO DECKS FOUND' in response.text:
-                reached_target_nb_decks = True
-            soup = BeautifulSoup(response.text, 'html.parser')
-            links = soup.find_all('a')
-            for link in links:
-                href = link.get('href')
-                if ('-decklist-by-' in href):
-                    first_link = link
-                    break
-            if first_link == previous_first_link:
-                reached_target_nb_decks = True
-                break
-            for link in links:
-                href = link.get('href')
-                # Discover the decks
-                if href:
-                    if len(deck_links) < max_number_decks:
-                        if ('-decklist-by-' in href):
-                            if f'{mtgdecks_base_url}{href}' not in deck_links:
-                                deck_links.append(f'{mtgdecks_base_url}{href}')
-                    else:
-                        reached_target_nb_decks = True
-            previous_first_link = first_link
-            n += 1
-        for deck_link in deck_links:
-            # Create the deck
-            decks[deck_link[-7:]] = {'main': {}, 'side': {}}
-            deck_part = ''
-            deck_section = ''
-            response = get(deck_link, headers=user_agent)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            tables = soup.find_all('table')
-            # Parse the tables of cards
-            for table in tables:
-                rows = table.find_all('tr')
-                for row in rows:
-                    cols = row.find_all('th')
-                    for col in cols:
-                        # Detect sections
-                        if col.has_attr('class'):
-                            if col['class'][1] == 'Creature':
-                                deck_section = 'creatures'
-                                deck_part = 'main'
-                            elif col['class'][1] == 'Land':
-                                deck_section = 'lands'
-                                deck_part = 'main'
-                            elif col['class'][1] == 'Sideboard':
-                                deck_section = 'sideboard'
-                                deck_part = 'side'
-                            else:
-                                deck_section = 'other spells'
-                                deck_part = 'main'
-                    # Discover cards
-                    if row.has_attr('data-required'):
-                        quantity=int(row['data-required'])
-                        decks[deck_link[-7:]][deck_part][row['data-card-id']] = [quantity, deck_section] # A card is added with a quantity and the righ section
-                    
+        decks = decks | deck
+                 
     if not decks:
         print('No matching decks found')
         exit()
 
     # For EDH on mtgtop8.com, determine if different commanders to be able to filter on
-    if 'EDH' in mtg_format and mtg_source == 'mtgtop8':
+    if 'EDH' in mtg_format:
         commanders = []
         # Find all used commanders
-        for deck in decks.keys():
-            side_cards = decks[deck]['side'].keys()
+        for deck in decks:
+            side_cards = decks[deck]['side']
             for card in side_cards:
                 commanders.append(card)
         fixed_commander = ''
-        commander_choice_str = ''
+        commander_choice_str = '0 - Any\n'
         # Detect if a commander is always used anyway
         for commander in commanders:
-            if commanders.count(commander) == len(decks.keys()):
+            if commanders.count(commander) == len(decks):
                 fixed_commander = commander
         commanders = set(commanders) # Turn it into a set to keep only unique values
         if fixed_commander:
             commanders.remove(fixed_commander)
-        commanders_dict = {}
-        n = 0
+        commanders_dict = {0: 'Any'}
+        n = 1
         for commander in commanders:
-            commander_choice_str += f'{n+1} - {commander}\n'
+            commander_choice_str += f'{n} - {commander}\n'
             commanders_dict[n] = commander
             n += 1
         if len(commanders) > 1:
@@ -675,19 +671,21 @@ if __name__ == '__main__':
                 try:
                     commander_choices = commander_choices.split(',')
                     for choice in commander_choices:
-                        selected_commanders.append(commanders_dict[int(choice)-1])
+                        selected_commanders.append(commanders_dict[int(choice)])
                     if not selected_commanders:
                         print('Invalid choice.')
                 except Exception:
                     print('Invalid choice.')
+            if {0: 'Any'} in selected_commanders:
+                selected_commanders = [] 
             # Let's not forget to consider an always used commander if any
             if fixed_commander:
                 selected_commanders.append(fixed_commander) 
             # Only keep decks using selected commanders
             filtered_decks = {}
-            for deck in decks.keys():
+            for deck in decks:
                 commander_present_in_side = False
-                side_cards = decks[deck]['side'].keys()
+                side_cards = decks[deck]['side']
                 for selected_commander in selected_commanders:
                     if selected_commander in side_cards:
                         commander_present_in_side = True
@@ -699,47 +697,78 @@ if __name__ == '__main__':
     main_avg_card_counts = {}
     side_avg_card_counts = {}
 
-    for deck in decks.keys():
+    # Determine number of decks using each card and top chosen number of cards in using decks
+    main_top_card_counts = {}
+    side_top_card_counts = {}
 
-        main_cards = decks[deck]['main'].keys()
+    for deck in decks:
+
+        main_cards = decks[deck]['main']
         for card in main_cards:
             quantity = decks[deck]['main'][card][0]
             section = decks[deck]['main'][card][1]
-            if card not in main_avg_card_counts.keys():
-                main_avg_card_counts[card] = [1, quantity, quantity, section] # [number of using decks, total quantity, avg, section]
+            if not top_method:
+                if card not in main_avg_card_counts:
+                    main_avg_card_counts[card] = [1, quantity, quantity, section] # [number of using decks, total quantity, avg, section]
+                else:
+                    main_avg_card_counts[card][0] += 1
+                    main_avg_card_counts[card][1] += quantity
+                    main_avg_card_counts[card][2] = round(main_avg_card_counts[card][1] / main_avg_card_counts[card][0])
             else:
-                main_avg_card_counts[card][0] += 1
-                main_avg_card_counts[card][1] += quantity
-                main_avg_card_counts[card][2] = round(main_avg_card_counts[card][1] / main_avg_card_counts[card][0])
+                if card not in main_top_card_counts:
+                    main_top_card_counts[card] = [1, {quantity:1}, quantity, section] # [number of using decks, all quantities, top chosen quantity, section]
+                else:
+                    main_top_card_counts[card][0] += 1
+                    if quantity not in main_top_card_counts[card][1]:
+                        main_top_card_counts[card][1][quantity] = 1
+                    else:
+                        main_top_card_counts[card][1][quantity] += 1
+                    main_top_card_counts[card][2] = max(main_top_card_counts[card][1], key=main_top_card_counts[card][1].get)
             
-        side_cards = decks[deck]['side'].keys()
+        side_cards = decks[deck]['side']
         for card in side_cards:
             quantity = decks[deck]['side'][card][0]
             section = decks[deck]['side'][card][1]
-            if card not in side_avg_card_counts.keys():
-                side_avg_card_counts[card] = [1, quantity, quantity, section] # [number of using decks, total quantity, avg, section]
+            if not top_method:
+                if card not in side_avg_card_counts:
+                    side_avg_card_counts[card] = [1, quantity, quantity, section] # [number of using decks, total quantity, avg, section]
+                else:
+                    side_avg_card_counts[card][0] += 1
+                    side_avg_card_counts[card][1] += quantity
+                    side_avg_card_counts[card][2] = round(side_avg_card_counts[card][1] / side_avg_card_counts[card][0])
             else:
-                side_avg_card_counts[card][0] += 1
-                side_avg_card_counts[card][1] += quantity
-                side_avg_card_counts[card][2] = round(side_avg_card_counts[card][1] / side_avg_card_counts[card][0])
-        
-    # Sort by top used cards
-    sorted_main_avg_card_counts = sorted(main_avg_card_counts.items(), key=lambda x: x[1][0], reverse=True)
-    sorted_side_avg_card_counts = sorted(side_avg_card_counts.items(), key=lambda x: x[1][0], reverse=True)
+                if card not in side_top_card_counts:
+                    side_top_card_counts[card] = [1, {quantity:1}, quantity, section] # [number of using decks, all quantities, top chosen quantity, section]
+                else:
+                    side_top_card_counts[card][0] += 1
+                    if quantity not in side_top_card_counts[card][1]:
+                        side_top_card_counts[card][1][quantity] = 1
+                    else:
+                        side_top_card_counts[card][1][quantity] += 1
+                    side_top_card_counts[card][2] = max(side_top_card_counts[card][1], key=side_top_card_counts[card][1].get)
 
     # For EDH and cEDH format, adapt target number of cards in deck
     if ('EDH' in mtg_format) or ('Commander' in mtg_format):
         main_target = 99
         side_target = 1
         # If the first parsed deck has 2 EDH commanders, let's adjust the targets
-        if len(decks[list(decks.keys())[0]]['side']) == 2:
+        if len(decks[list(decks)[0]]['side']) == 2:
             main_target = 98
             side_target = 2
     else:
         main_target = 60
         side_target = 15
 
-    avg_deck = build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, main_target, side_target)
+    if top_method:
+        # Sort by top used cards and build average deck
+        sorted_main_top_card_counts = sorted(main_top_card_counts.items(), key=lambda x: x[1][0], reverse=True)
+        sorted_side_top_card_counts = sorted(side_top_card_counts.items(), key=lambda x: x[1][0], reverse=True)
+        avg_deck = build_avg_deck(sorted_main_top_card_counts, sorted_side_top_card_counts, main_target, side_target, len(decks))
+    else:
+        # Sort by top used cards and build average deck
+        sorted_main_avg_card_counts = sorted(main_avg_card_counts.items(), key=lambda x: x[1][0], reverse=True)
+        sorted_side_avg_card_counts = sorted(side_avg_card_counts.items(), key=lambda x: x[1][0], reverse=True)
+        avg_deck = build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, main_target, side_target, len(decks))
 
     print('\n')
-    print_avg_deck(avg_deck, len(decks.keys()), print_with_details, maybeboard)
+    print_avg_deck(avg_deck, len(decks), print_with_details, maybeboard)
