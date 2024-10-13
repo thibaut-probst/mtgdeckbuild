@@ -690,51 +690,63 @@ Did you mean Gruul Aggro? [y/n] (y):
 3 Pawpatch Formation
 1 Scorching Shot
 ```
-Standard Gruul Aggro average deck considering only the last 10 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing::
+Standard Gruul Aggro average deck considering only the last 15 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing::
 ```
-$ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 20 -M -T -b -p
+$ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 15 -M -T -b -p
 
 
 //----------------------------------------------------------------------
 // LANDS - 20 cards
 //----------------------------------------------------------------------
-8 Mountain - Used by 20/20 decks
-4 Copperline Gorge - Used by 20/20 decks
-4 Karplusan Forest - Used by 20/20 decks
-4 Thornspire Verge - Used by 19/20 decks
+8 Mountain - Used by 15/15 decks
+4 Copperline Gorge - Used by 15/15 decks
+4 Karplusan Forest - Used by 15/15 decks
+4 Thornspire Verge - Used by 14/15 decks
 //----------------------------------------------------------------------
-// CREATURES - 21 cards
+// CREATURES - 20 cards
 //----------------------------------------------------------------------
-4 Emberheart Challenger - Used by 18/20 decks
-4 Heartfire Hero - Used by 18/20 decks
-4 Monastery Swiftspear - Used by 18/20 decks
-4 Cacophony Scamp - Used by 12/20 decks
-4 Slickshot Show-Off - Used by 9/20 decks
-1 Picnic Ruiner - Used by 9/20 decks
+4 Emberheart Challenger - Used by 13/15 decks
+4 Heartfire Hero - Used by 13/15 decks
+4 Monastery Swiftspear - Used by 13/15 decks
+4 Cacophony Scamp - Used by 9/15 decks
+3 Picnic Ruiner - Used by 8/15 decks
+1 Slickshot Show-Off - Used by 5/15 decks
 //----------------------------------------------------------------------
-// OTHER SPELLS - 19 cards
+// OTHER SPELLS - 20 cards
 //----------------------------------------------------------------------
-4 Monstrous Rage - Used by 18/20 decks
-4 Turn Inside Out - Used by 16/20 decks
-4 Might of the Meek - Used by 13/20 decks
-4 Leyline of Resonance - Used by 12/20 decks
-2 Snakeskin Veil - Used by 16/20 decks
-1 Shock - Used by 9/20 decks
+4 Monstrous Rage - Used by 13/15 decks
+4 Might of the Meek - Used by 12/15 decks
+4 Turn Inside Out - Used by 11/15 decks
+4 Leyline of Resonance - Used by 9/15 decks
+2 Snakeskin Veil - Used by 13/15 decks
+2 Witch's Mark - Used by 8/15 decks
 //----------------------------------------------------------------------
 // SIDEBOARD - 15 cards
 //----------------------------------------------------------------------
-4 Urabrask's Forge - Used by 18/20 decks
-4 Torch the Tower - Used by 13/20 decks
-3 Pawpatch Formation - Used by 17/20 decks
-3 Obliterating Bolt - Used by 17/20 decks
-1 Witchstalker Frenzy - Used by 6/20 decks
+4 Torch the Tower - Used by 12/15 decks
+3 Urabrask's Forge - Used by 13/15 decks
+3 Pawpatch Formation - Used by 12/15 decks
+3 Obliterating Bolt - Used by 12/15 decks
+2 Twisted Fealty - Used by 5/15 decks
 //----------------------------------------------------------------------
-// MAYBEBOARD - 6 cards
+// MAYBEBOARD - 18 cards
 //----------------------------------------------------------------------
-3 Witch's Mark - Used by 9/20 decks
-1 Restless Ridgeline - Used by 8/20 decks
-4 Manifold Mouse - Used by 8/20 decks
-3 Callous Sell-Sword - Used by 6/20 decks
-1 Forest - Used by 5/20 decks
-1 Rockface Village - Used by 5/20 decks
+4 Shock - Used by 5/15 decks
+1 Restless Ridgeline - Used by 4/15 decks
+4 Manifold Mouse - Used by 4/15 decks
+2 Questing Druid - Used by 3/15 decks
+1 Forest - Used by 3/15 decks
+2 Rockface Village - Used by 3/15 decks
+4 Innkeeper's Talent - Used by 3/15 decks
+2 Audacity - Used by 2/15 decks
+2 Callous Sell-Sword - Used by 2/15 decks
+2 Royal Treatment - Used by 2/15 decks
+1 Commercial District - Used by 2/15 decks
+4 Fear of Missing Out - Used by 2/15 decks
+4 Inti, Seneschal of the Sun - Used by 2/15 decks
+4 Omnivorous Flytrap - Used by 2/15 decks
+4 Wildfire Wickerfolk - Used by 2/15 decks
+4 Break Out - Used by 2/15 decks
+4 Torch the Tower - Used by 2/15 decks
+1 Witchstalker Frenzy - Used by 2/15 decks
 ```

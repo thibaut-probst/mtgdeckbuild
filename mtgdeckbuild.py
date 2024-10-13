@@ -301,9 +301,10 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
                         avg_deck['main'][section][card] = [nb_cards, nb_decks]
                         main_deck_total += nb_cards
                         main_cards.append(card)
-                else: # Add cards to the section until the target for this section
-                    avg_deck['main'][section][card] = [delta_sections[section], nb_decks]
-                    main_deck_total += delta_sections[section]
+                elif (nb_cards > delta_sections[section]) and (delta_sections[section] > 0): # Add cards to the section until the target for this section
+                    avg_deck['main'][section][card] = [nb_cards-delta_sections[section], nb_decks]
+                    main_deck_total += nb_cards-delta_sections[section]
+                    main_cards.append(card)
             else:
                 if (delta_main <= delta_sections[section]): # Add cards to the section unless we're over target number of cards for this section
                     avg_deck['main'][section][card] = [delta_main, nb_decks]
@@ -313,9 +314,10 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
                         avg_deck['main'][section][card] = [delta_main, nb_decks]
                         main_deck_total += delta_main
                         main_cards.append(card)
-                else: # Add cards to the section until the target for this section
-                    avg_deck['main'][section][card] = [delta_sections[section], nb_decks]
-                    main_deck_total += delta_sections[section]
+                elif (delta_main > delta_sections[section]) and (delta_sections[section] > 0): # Add cards to the section until the target for this section
+                    avg_deck['main'][section][card] = [delta_main-delta_sections[section], nb_decks]
+                    main_deck_total += delta_main-delta_sections[section]
+                    main_cards.append(card)
 
             n += 1
 
@@ -746,7 +748,7 @@ if __name__ == '__main__':
     if balance:
         section_avg = {'lands':0, 'creatures':0, 'other spells': 0} # option chosen
     else:
-        section_avg = {'lands':100, 'creatures':100, 'other spells': 100} # option not chosen then set no limits
+        section_avg = {'lands':1000, 'creatures':1000, 'other spells': 1000} # option not chosen then set no limits
 
     for deck in decks:
         main_cards = decks[deck]['main']
