@@ -17,7 +17,7 @@ A Magic: The Gathering format archetype average deck building tool based on tour
 * Filtering available to only consider decks including given card names in main deck and/or sideboard.
 * Filtering available to only consider decks including given deck names.
 * Filtering available to only consider decks over the last given months.
-* Two methods available to determine the quantity of the most used cards in the average deck: average quantity (default) or top chosen quantity.
+* Two methods available to determine the quantity of each card in the average deck: average quantity (default) or top chosen quantity amongst analyzed decks (except when last cards are added in order to avoid going over the deck limits).
 * Possibility to target a number of cards per section in the average deck based on the average number of cards per section in the analyzed decks while locking the lands section target.
 * Possibility to display a Maybeboard section with all the cards that are tied or minus a number (analyzed decks / 5) in terms of number of decks using them for main deck and sideboard.
 * Simple or detailed printing of the average decklist available.
@@ -692,59 +692,49 @@ Did you mean Gruul Aggro? [y/n] (y):
 ```
 Standard Gruul Aggro average deck considering only the last 10 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing::
 ```
-$ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 10 -M -T -b -p
+$ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 20 -M -T -b -p
 
 
 //----------------------------------------------------------------------
-// LANDS - 21 cards
+// LANDS - 20 cards
 //----------------------------------------------------------------------
-8 Mountain - Used by 10/10 decks
-4 Copperline Gorge - Used by 10/10 decks
-4 Karplusan Forest - Used by 10/10 decks
-4 Thornspire Verge - Used by 9/10 decks
-1 Restless Ridgeline - Used by 4/10 decks
+8 Mountain - Used by 20/20 decks
+4 Copperline Gorge - Used by 20/20 decks
+4 Karplusan Forest - Used by 20/20 decks
+4 Thornspire Verge - Used by 19/20 decks
 //----------------------------------------------------------------------
 // CREATURES - 21 cards
 //----------------------------------------------------------------------
-4 Emberheart Challenger - Used by 8/10 decks
-4 Heartfire Hero - Used by 8/10 decks
-4 Monastery Swiftspear - Used by 8/10 decks
-4 Slickshot Show-Off - Used by 4/10 decks
-4 Cacophony Scamp - Used by 4/10 decks
-1 Picnic Ruiner - Used by 4/10 decks
+4 Emberheart Challenger - Used by 18/20 decks
+4 Heartfire Hero - Used by 18/20 decks
+4 Monastery Swiftspear - Used by 18/20 decks
+4 Cacophony Scamp - Used by 12/20 decks
+4 Slickshot Show-Off - Used by 9/20 decks
+1 Picnic Ruiner - Used by 9/20 decks
 //----------------------------------------------------------------------
-// OTHER SPELLS - 18 cards
+// OTHER SPELLS - 19 cards
 //----------------------------------------------------------------------
-4 Monstrous Rage - Used by 8/10 decks
-4 Might of the Meek - Used by 7/10 decks
-4 Turn Inside Out - Used by 6/10 decks
-4 Shock - Used by 4/10 decks
-2 Snakeskin Veil - Used by 8/10 decks
+4 Monstrous Rage - Used by 18/20 decks
+4 Turn Inside Out - Used by 16/20 decks
+4 Might of the Meek - Used by 13/20 decks
+4 Leyline of Resonance - Used by 12/20 decks
+2 Snakeskin Veil - Used by 16/20 decks
+1 Shock - Used by 9/20 decks
 //----------------------------------------------------------------------
 // SIDEBOARD - 15 cards
 //----------------------------------------------------------------------
-4 Urabrask's Forge - Used by 8/10 decks
-4 Torch the Tower - Used by 7/10 decks
-3 Pawpatch Formation - Used by 8/10 decks
-3 Obliterating Bolt - Used by 8/10 decks
-1 Witchstalker Frenzy - Used by 3/10 decks
+4 Urabrask's Forge - Used by 18/20 decks
+4 Torch the Tower - Used by 13/20 decks
+3 Pawpatch Formation - Used by 17/20 decks
+3 Obliterating Bolt - Used by 17/20 decks
+1 Witchstalker Frenzy - Used by 6/20 decks
 //----------------------------------------------------------------------
-// MAYBEBOARD - 16 cards
+// MAYBEBOARD - 6 cards
 //----------------------------------------------------------------------
-4 Leyline of Resonance - Used by 4/10 decks
-3 Witch's Mark - Used by 4/10 decks
-2 Questing Druid - Used by 3/10 decks
-1 Forest - Used by 3/10 decks
-2 Rockface Village - Used by 3/10 decks
-4 Manifold Mouse - Used by 3/10 decks
-4 Innkeeper's Talent - Used by 3/10 decks
-2 Audacity - Used by 2/10 decks
-1 Commercial District - Used by 2/10 decks
-4 Fear of Missing Out - Used by 2/10 decks
-4 Inti, Seneschal of the Sun - Used by 2/10 decks
-4 Omnivorous Flytrap - Used by 2/10 decks
-4 Wildfire Wickerfolk - Used by 2/10 decks
-4 Break Out - Used by 2/10 decks
-4 Torch the Tower - Used by 2/10 decks
-1 Witchstalker Frenzy - Used by 2/10 decks
+3 Witch's Mark - Used by 9/20 decks
+1 Restless Ridgeline - Used by 8/20 decks
+4 Manifold Mouse - Used by 8/20 decks
+3 Callous Sell-Sword - Used by 6/20 decks
+1 Forest - Used by 5/20 decks
+1 Rockface Village - Used by 5/20 decks
 ```

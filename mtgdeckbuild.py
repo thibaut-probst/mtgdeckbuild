@@ -296,21 +296,26 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
                     avg_deck['main'][section][card] = [nb_cards, nb_decks]
                     main_deck_total += nb_cards
                     main_cards.append(card)
-                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section thenonly if all sections are full and this is not the lands section
-                    print('OK')
+                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section only if all sections are full and this is not the lands section
                     if section != 'lands':
                         avg_deck['main'][section][card] = [nb_cards, nb_decks]
                         main_deck_total += nb_cards
                         main_cards.append(card)
+                else: # Add cards to the section until the target for this section
+                    avg_deck['main'][section][card] = [delta_sections[section], nb_decks]
+                    main_deck_total += delta_sections[section]
             else:
                 if (delta_main <= delta_sections[section]): # Add cards to the section unless we're over target number of cards for this section
                     avg_deck['main'][section][card] = [delta_main, nb_decks]
                     main_deck_total += delta_main
-                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section thenonly if all sections are full and this is not the lands section
+                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section only if all sections are full and this is not the lands section
                     if section != 'lands':
                         avg_deck['main'][section][card] = [delta_main, nb_decks]
                         main_deck_total += delta_main
-                        main_cards.append(card)       
+                        main_cards.append(card)
+                else: # Add cards to the section until the target for this section
+                    avg_deck['main'][section][card] = [delta_sections[section], nb_decks]
+                    main_deck_total += delta_sections[section]
 
             n += 1
 
@@ -600,7 +605,7 @@ if __name__ == '__main__':
 
             # Deck comparison
             deck_section = ''
-            card_count_regex = compile('<div class="c">([1-9]{0,2})</div>')
+            card_count_regex = compile('<div class="c">([0-9]{0,2})</div>')
             
             # Deck comparison to get all the cards
             response = post(f'{mtgtop8_base_url}/compare', data = compare_str, headers={'referer': '{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})   
@@ -744,7 +749,6 @@ if __name__ == '__main__':
         section_avg = {'lands':100, 'creatures':100, 'other spells': 100} # option not chosen then set no limits
 
     for deck in decks:
-
         main_cards = decks[deck]['main']
         for card in main_cards:
             quantity = decks[deck]['main'][card][0]
