@@ -18,6 +18,7 @@ A Magic: The Gathering format archetype average deck building tool based on tour
 * Filtering available to only consider decks including given deck names.
 * Filtering available to only consider decks over the last given months.
 * Two methods available to determine the quantity of the most used cards in the average deck: average quantity (default) or top chosen quantity.
+* Possibility to target a number of cards per section in the average deck based on the average number of cards per section in the analyzed decks while locking the lands section target.
 * Possibility to display a Maybeboard section with all the cards that are tied or minus a number (analyzed decks / 5) in terms of number of decks using them for main deck and sideboard.
 * Simple or detailed printing of the average decklist available.
 
@@ -44,7 +45,8 @@ You can display ***MTGDeckBuild*** startup parameters information by using the -
 ```
 $ python3 mtgdeckbuild.py -h
 usage: mtgdeckbuild.py [-h] [--top-archetypes TOP_ARCHETYPES] [--format FORMAT] [--archetype ARCHETYPE] [--decks DECKS] [--print-details] [--competitive-only]
-                       [--name NAME] [--include-cards INCLUDE_CARDS] [--main-include] [--side-include] [--last-months LAST_MONTHS] [--top-quantity] [--maybeboard]
+                       [--name NAME] [--include-cards INCLUDE_CARDS] [--main-include] [--side-include] [--last-months LAST_MONTHS] [--top-quantity] [--balance]
+                       [--maybeboard]
 
 options:
   -h, --help            show this help message and exit
@@ -67,7 +69,8 @@ options:
   --last-months LAST_MONTHS, -l LAST_MONTHS
                         Only consider decks from the last given months
   --top-quantity, -T    Build average deck based on the top used quantity for each most used card in analyzed decks (default: based on the average quantity)
-  --maybeboard          Print Maybeboard (additional cards that are tied or minus one in terms of number of decks using them)
+  --balance, -b         Balance the number of cards for each section (lands, creatures, other spells) based on the average number of cards per section in then analyzed decks (default: do not balance and just retain the most used cards)
+  --maybeboard, -M      Print Maybeboard (additional cards that are tied or minus one in terms of number of decks using them)
 ```
 
 ## Examples
@@ -557,7 +560,7 @@ Different commanders are used in analyzed decks. Select those you want to keep. 
 1 Yoshimaru, Ever Faithful - Used by 20/20 decks
 1 Bruse Tarl, Boorish Herder - Used by 15/20 decks
 ```
-Standard Gruul Aggro average deck where the deck names includes "Dino" considering onlydecks over the last 1 month:
+Standard Gruul Aggro average deck where the deck names includes "Dino" considering only decks over the last 1 month:
 ```
 $ python3 mtgdeckbuild.py -n Dino -l 1
 Select a format:
@@ -686,4 +689,62 @@ Did you mean Gruul Aggro? [y/n] (y):
 3 Tectonic Hazard
 3 Pawpatch Formation
 1 Scorching Shot
+```
+Standard Gruul Aggro average deck considering only the last 10 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing::
+```
+$ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 10 -M -T -b -p
+
+
+//----------------------------------------------------------------------
+// LANDS - 21 cards
+//----------------------------------------------------------------------
+8 Mountain - Used by 10/10 decks
+4 Copperline Gorge - Used by 10/10 decks
+4 Karplusan Forest - Used by 10/10 decks
+4 Thornspire Verge - Used by 9/10 decks
+1 Restless Ridgeline - Used by 4/10 decks
+//----------------------------------------------------------------------
+// CREATURES - 21 cards
+//----------------------------------------------------------------------
+4 Emberheart Challenger - Used by 8/10 decks
+4 Heartfire Hero - Used by 8/10 decks
+4 Monastery Swiftspear - Used by 8/10 decks
+4 Slickshot Show-Off - Used by 4/10 decks
+4 Cacophony Scamp - Used by 4/10 decks
+1 Picnic Ruiner - Used by 4/10 decks
+//----------------------------------------------------------------------
+// OTHER SPELLS - 18 cards
+//----------------------------------------------------------------------
+4 Monstrous Rage - Used by 8/10 decks
+4 Might of the Meek - Used by 7/10 decks
+4 Turn Inside Out - Used by 6/10 decks
+4 Shock - Used by 4/10 decks
+2 Snakeskin Veil - Used by 8/10 decks
+//----------------------------------------------------------------------
+// SIDEBOARD - 15 cards
+//----------------------------------------------------------------------
+4 Urabrask's Forge - Used by 8/10 decks
+4 Torch the Tower - Used by 7/10 decks
+3 Pawpatch Formation - Used by 8/10 decks
+3 Obliterating Bolt - Used by 8/10 decks
+1 Witchstalker Frenzy - Used by 3/10 decks
+//----------------------------------------------------------------------
+// MAYBEBOARD - 16 cards
+//----------------------------------------------------------------------
+4 Leyline of Resonance - Used by 4/10 decks
+3 Witch's Mark - Used by 4/10 decks
+2 Questing Druid - Used by 3/10 decks
+1 Forest - Used by 3/10 decks
+2 Rockface Village - Used by 3/10 decks
+4 Manifold Mouse - Used by 3/10 decks
+4 Innkeeper's Talent - Used by 3/10 decks
+2 Audacity - Used by 2/10 decks
+1 Commercial District - Used by 2/10 decks
+4 Fear of Missing Out - Used by 2/10 decks
+4 Inti, Seneschal of the Sun - Used by 2/10 decks
+4 Omnivorous Flytrap - Used by 2/10 decks
+4 Wildfire Wickerfolk - Used by 2/10 decks
+4 Break Out - Used by 2/10 decks
+4 Torch the Tower - Used by 2/10 decks
+1 Witchstalker Frenzy - Used by 2/10 decks
 ```

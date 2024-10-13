@@ -248,7 +248,7 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
 
 
 
-def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target, side_target, nb_analyzed_decks):
+def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target, side_target, section_avg, nb_analyzed_decks):
     '''
     Builds an average deck based on the provided average card counts.
 
@@ -257,6 +257,7 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
         sorted_side_card_counts (list): A sorted list of (average or top quantity) card counts for the sideboard. Each item in the list is a tuple of (card, [count, decks, section]).
         main_target (int): The target number of cards for the main deck.
         side_target (int): The target number of cards for the sideboard.
+        section_avg (dict): The average number of cards per section for the main deck.
         nb_analyzed_decks (int): The total number of analyzed decks.
         
     Returns:
@@ -267,24 +268,50 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
 
     # Main deck building
     main_cards = []
+    delta_sections = {}
+
     if sorted_main_card_counts:
         main_deck_total = 0
         n = 0
-        while not (main_deck_total == main_target): # Process while we haven't reached the target
+        while not (main_deck_total == main_target): # Process available cards while we haven't reached the target
+            
+            # Retrieve card information
             card_count = sorted_main_card_counts[n]
             card = card_count[0]
             nb_decks = card_count[1][0]
             nb_cards = card_count[1][2]
             section = card_count[1][3]
-            delta = main_target - main_deck_total
-            # Add cards unless if we'll go over target number of cards, just reach the target so don't add the full cardset
-            if nb_cards <= delta:
-                avg_deck['main'][section][card] = [nb_cards, nb_decks]
-                main_deck_total += nb_cards
+            
+            # Update remaining spots for main deck and each section
+            delta_main = main_target - main_deck_total
+            for s in section_avg:
+                total_c = 0
+                for c in avg_deck['main'][s]:
+                    total_c += avg_deck['main'][s][c][0]
+                delta_sections[s] = section_avg[s] - total_c
+
+            # Add cards unless if we'll go over target number of cards, just reach the target otherwise. Take into account cards section balance.
+            if nb_cards <= delta_main:
+                if nb_cards <= delta_sections[section]: # Add cards to the section unless we're over target number of cards for this section
+                    avg_deck['main'][section][card] = [nb_cards, nb_decks]
+                    main_deck_total += nb_cards
+                    main_cards.append(card)
+                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section thenonly if all sections are full and this is not the lands section
+                    print('OK')
+                    if section != 'lands':
+                        avg_deck['main'][section][card] = [nb_cards, nb_decks]
+                        main_deck_total += nb_cards
+                        main_cards.append(card)
             else:
-                avg_deck['main'][section][card] = [delta, nb_decks]
-                main_deck_total += delta
-            main_cards.append(card)
+                if (delta_main <= delta_sections[section]): # Add cards to the section unless we're over target number of cards for this section
+                    avg_deck['main'][section][card] = [delta_main, nb_decks]
+                    main_deck_total += delta_main
+                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section thenonly if all sections are full and this is not the lands section
+                    if section != 'lands':
+                        avg_deck['main'][section][card] = [delta_main, nb_decks]
+                        main_deck_total += delta_main
+                        main_cards.append(card)       
+
             n += 1
 
         # Maybeboard
@@ -314,15 +341,15 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
             card = card_count[0]
             nb_decks = card_count[1][0]
             nb_cards = card_count[1][2]
-            delta = side_target - side_deck_total
+            delta_side = side_target - side_deck_total
             # Add cards unless if we'll go over target number of cards, just reach the target so don't add the full cardset
             if card not in main_cards:
-                if nb_cards <= delta:
+                if nb_cards <= delta_side:
                     avg_deck['side'][card] = [nb_cards, nb_decks]
                     side_deck_total += nb_cards
                 else:
-                    avg_deck['side'][card] = [delta, nb_decks]
-                    side_deck_total += delta
+                    avg_deck['side'][card] = [delta_side, nb_decks]
+                    side_deck_total += delta_side
             n += 1
     
     return avg_deck
@@ -421,7 +448,14 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--maybeboard',
+        '--balance', '-b',
+        action = 'store_true',
+        default = False,
+        help = 'Balance the number of cards for each section (lands, creatures, other spells) based on the average number of cards per section in then analyzed decks (default: do not balance and just retain the most used cards)'
+    )
+
+    parser.add_argument(
+        '--maybeboard', '-M',
         action = 'store_true',
         default = False,
         help = 'Print Maybeboard (additional cards that are tied or minus one in terms of number of decks using them)'
@@ -492,6 +526,7 @@ if __name__ == '__main__':
         max_number_decks = 10000000
 
     top_method = args['top_quantity']
+    balance = args['maybeboard']
     maybeboard = args['maybeboard']
 
     if not mtg_format:
@@ -693,13 +728,20 @@ if __name__ == '__main__':
                     filtered_decks[deck] = decks[deck]
             decks = filtered_decks
 
-    # Determine number of decks using each card and average number of cards in using decks
-    main_avg_card_counts = {}
-    side_avg_card_counts = {}
+    if not top_method:
+        # Determine number of decks using each card and average number of cards in using decks
+        main_avg_card_counts = {}
+        side_avg_card_counts = {}
+    else:
+        # Determine number of decks using each card and top chosen number of cards in using decks
+        main_top_card_counts = {}
+        side_top_card_counts = {}
 
-    # Determine number of decks using each card and top chosen number of cards in using decks
-    main_top_card_counts = {}
-    side_top_card_counts = {}
+    # avg number of lands, creatures and other spells
+    if balance:
+        section_avg = {'lands':0, 'creatures':0, 'other spells': 0} # option chosen
+    else:
+        section_avg = {'lands':100, 'creatures':100, 'other spells': 100} # option not chosen then set no limits
 
     for deck in decks:
 
@@ -724,7 +766,11 @@ if __name__ == '__main__':
                     else:
                         main_top_card_counts[card][1][quantity] += 1
                     main_top_card_counts[card][2] = max(main_top_card_counts[card][1], key=main_top_card_counts[card][1].get)
-            
+        
+            # Compute average number of cards per section to have these as targets if option is chosen
+            if balance:
+                section_avg[section] += quantity
+
         side_cards = decks[deck]['side']
         for card in side_cards:
             quantity = decks[deck]['side'][card][0]
@@ -747,6 +793,11 @@ if __name__ == '__main__':
                         side_top_card_counts[card][1][quantity] += 1
                     side_top_card_counts[card][2] = max(side_top_card_counts[card][1], key=side_top_card_counts[card][1].get)
 
+    # Finish compute of average number of cards per section to have these as targets if option is chosen
+    if balance:
+        for section, avg in section_avg.items():
+            section_avg[section] = round(avg / len(decks))
+
     # For EDH and cEDH format, adapt target number of cards in deck
     if ('EDH' in mtg_format) or ('Commander' in mtg_format):
         main_target = 99
@@ -763,12 +814,12 @@ if __name__ == '__main__':
         # Sort by top used cards and build average deck
         sorted_main_top_card_counts = sorted(main_top_card_counts.items(), key=lambda x: x[1][0], reverse=True)
         sorted_side_top_card_counts = sorted(side_top_card_counts.items(), key=lambda x: x[1][0], reverse=True)
-        avg_deck = build_avg_deck(sorted_main_top_card_counts, sorted_side_top_card_counts, main_target, side_target, len(decks))
+        avg_deck = build_avg_deck(sorted_main_top_card_counts, sorted_side_top_card_counts, main_target, side_target, section_avg, len(decks))
     else:
         # Sort by top used cards and build average deck
         sorted_main_avg_card_counts = sorted(main_avg_card_counts.items(), key=lambda x: x[1][0], reverse=True)
         sorted_side_avg_card_counts = sorted(side_avg_card_counts.items(), key=lambda x: x[1][0], reverse=True)
-        avg_deck = build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, main_target, side_target, len(decks))
+        avg_deck = build_avg_deck(sorted_main_avg_card_counts, sorted_side_avg_card_counts, main_target, side_target, section_avg, len(decks))
 
     print('\n')
     print_avg_deck(avg_deck, len(decks), print_with_details, maybeboard)
