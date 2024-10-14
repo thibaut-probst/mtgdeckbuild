@@ -273,6 +273,8 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
     if sorted_main_card_counts:
         main_deck_total = 0
         n = 0
+        reset = False
+
         while not (main_deck_total == main_target): # Process available cards while we haven't reached the target
             
             # Retrieve card information
@@ -293,31 +295,44 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
             # Add cards unless if we'll go over target number of cards, just reach the target otherwise. Take into account cards section balance.
             if nb_cards <= delta_main:
                 if nb_cards <= delta_sections[section]: # Add cards to the section unless we're over target number of cards for this section
-                    avg_deck['main'][section][card] = [nb_cards, nb_decks]
-                    main_deck_total += nb_cards
-                    main_cards.append(card)
-                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section only if all sections are full and this is not the lands section
-                    if section != 'lands':
+                    if card not in avg_deck['main'][section]:
                         avg_deck['main'][section][card] = [nb_cards, nb_decks]
                         main_deck_total += nb_cards
                         main_cards.append(card)
+                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section only if all sections are full and this is not the lands section
+                    if not reset:
+                        n = 0 # Reset card parser to 0 not to miss some cards not added previously due to section limit full
+                        reset = True
+                    elif section != 'lands':
+                        if card not in avg_deck['main'][section]:
+                            avg_deck['main'][section][card] = [nb_cards, nb_decks]
+                            main_deck_total += nb_cards
+                            main_cards.append(card)
                 elif (nb_cards > delta_sections[section]) and (delta_sections[section] > 0): # Add cards to the section until the target for this section
-                    avg_deck['main'][section][card] = [nb_cards-delta_sections[section], nb_decks]
-                    main_deck_total += nb_cards-delta_sections[section]
-                    main_cards.append(card)
+                    if card not in avg_deck['main'][section]:
+                        avg_deck['main'][section][card] = [nb_cards-delta_sections[section], nb_decks]
+                        main_deck_total += nb_cards-delta_sections[section]
+                        main_cards.append(card)
             else:
                 if (delta_main <= delta_sections[section]): # Add cards to the section unless we're over target number of cards for this section
-                    avg_deck['main'][section][card] = [delta_main, nb_decks]
-                    main_deck_total += delta_main
-                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section only if all sections are full and this is not the lands section
-                    if section != 'lands':
+                    if card not in avg_deck['main'][section]:
                         avg_deck['main'][section][card] = [delta_main, nb_decks]
                         main_deck_total += delta_main
                         main_cards.append(card)
+                elif all(value == 0 for value in delta_sections.values()): # Add cards to the section only if all sections are full and this is not the lands section
+                    if not reset:
+                        n = 0 # Reset card parser to 0 not to miss some cards not added previously due to section limit full
+                        reset = True
+                    elif section != 'lands':
+                        if card not in avg_deck['main'][section]:
+                            avg_deck['main'][section][card] = [delta_main, nb_decks]
+                            main_deck_total += delta_main
+                            main_cards.append(card)
                 elif (delta_main > delta_sections[section]) and (delta_sections[section] > 0): # Add cards to the section until the target for this section
-                    avg_deck['main'][section][card] = [delta_main-delta_sections[section], nb_decks]
-                    main_deck_total += delta_main-delta_sections[section]
-                    main_cards.append(card)
+                    if card not in avg_deck['main'][section]:
+                        avg_deck['main'][section][card] = [delta_main-delta_sections[section], nb_decks]
+                        main_deck_total += delta_main-delta_sections[section]
+                        main_cards.append(card)
 
             n += 1
 
@@ -332,7 +347,8 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
                 nb_cards = card_count[1][2]
                 if 'maybeboard' not in avg_deck:
                     avg_deck['maybeboard'] = {}
-                avg_deck['maybeboard'][card] = [nb_cards, nb_decks]
+                if card not in main_cards:
+                    avg_deck['maybeboard'][card] = [nb_cards, nb_decks]
                 n += 1
                 if n < len(sorted_main_card_counts):
                     nb_decks_next = sorted_main_card_counts[n][1][0]
