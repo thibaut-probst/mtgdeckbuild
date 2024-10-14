@@ -690,7 +690,7 @@ Did you mean Gruul Aggro? [y/n] (y):
 3 Pawpatch Formation
 1 Scorching Shot
 ```
-Standard Gruul Aggro average deck considering only the last 15 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing::
+Standard Gruul Aggro average deck considering only the last 15 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing:
 ```
 $ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 15 -M -T -b -p
 
@@ -749,4 +749,167 @@ $ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 15 -M -T -b -p
 4 Break Out - Used by 2/15 decks
 4 Torch the Tower - Used by 2/15 decks
 1 Witchstalker Frenzy - Used by 2/15 decks
+```
+Duel-Commander Aminatou, The Fateshifter average deck considering decks since a specific date, including a specific card in the main deck, with maybeboard, balance of the deck section and detailed printing:
+```
+$ python3 mtgdeckbuild.py -f DC -a Aminatou -b -M -S 30-09-2024 -m -i "Archon of Cruelty" -p
+Archetype not found: Aminatou
+Did you mean Aminatou, The Fateshifter? [y/n] (y): 
+
+
+//----------------------------------------------------------------------
+// LANDS - 36 cards
+//----------------------------------------------------------------------
+1 Arid Mesa - Used by 6/6 decks (100%)
+1 Bloodstained Mire - Used by 6/6 decks (100%)
+1 Command Tower - Used by 6/6 decks (100%)
+1 Darkslick Shores - Used by 6/6 decks (100%)
+1 Drowned Catacomb - Used by 6/6 decks (100%)
+1 Flooded Strand - Used by 6/6 decks (100%)
+1 Godless Shrine - Used by 6/6 decks (100%)
+1 Hallowed Fountain - Used by 6/6 decks (100%)
+1 Island - Used by 6/6 decks (100%)
+1 Marsh Flats - Used by 6/6 decks (100%)
+1 Meticulous Archive - Used by 6/6 decks (100%)
+1 Misty Rainforest - Used by 6/6 decks (100%)
+1 Plains - Used by 6/6 decks (100%)
+1 Polluted Delta - Used by 6/6 decks (100%)
+1 Prismatic Vista - Used by 6/6 decks (100%)
+1 Scalding Tarn - Used by 6/6 decks (100%)
+1 Scrubland - Used by 6/6 decks (100%)
+1 Seachrome Coast - Used by 6/6 decks (100%)
+1 Shadowy Backstreet - Used by 6/6 decks (100%)
+1 Swamp - Used by 6/6 decks (100%)
+1 Tundra - Used by 6/6 decks (100%)
+1 Undercity Sewers - Used by 6/6 decks (100%)
+1 Underground River - Used by 6/6 decks (100%)
+1 Verdant Catacombs - Used by 6/6 decks (100%)
+1 Watery Grave - Used by 6/6 decks (100%)
+1 Windswept Heath - Used by 6/6 decks (100%)
+1 Adarkar Wastes - Used by 5/6 decks (83%)
+1 Glacial Fortress - Used by 5/6 decks (83%)
+1 Isolated Chapel - Used by 5/6 decks (83%)
+1 Reflecting Pool - Used by 5/6 decks (83%)
+1 Underground Sea - Used by 5/6 decks (83%)
+1 Floodfarm Verge - Used by 4/6 decks (67%)
+1 Gloomlake Verge - Used by 4/6 decks (67%)
+1 Tomb Fortress - Used by 4/6 decks (67%)
+1 Snow-Covered Island - Used by 3/6 decks (50%)
+1 Snow-Covered Swamp - Used by 2/6 decks (33%)
+//----------------------------------------------------------------------
+// CREATURES - 19 cards
+//----------------------------------------------------------------------
+1 Agent of Treachery - Used by 6/6 decks (100%)
+1 Archon of Cruelty - Used by 6/6 decks (100%)
+1 Ashen Rider - Used by 6/6 decks (100%)
+1 Lord of Change - Used by 6/6 decks (100%)
+1 Metamorphosis Fanatic - Used by 6/6 decks (100%)
+1 Spellseeker - Used by 6/6 decks (100%)
+1 Hoarding Broodlord - Used by 5/6 decks (83%)
+1 Overlord of the Floodpits - Used by 5/6 decks (83%)
+1 Psychic Frog - Used by 5/6 decks (83%)
+1 Rune-Scarred Demon - Used by 5/6 decks (83%)
+1 Tivit, Seller of Secrets - Used by 5/6 decks (83%)
+1 Troll of Khazad-dûm - Used by 5/6 decks (83%)
+1 Overlord of the Balemurk - Used by 4/6 decks (67%)
+1 Magister of Worth - Used by 4/6 decks (67%)
+1 Astral Dragon - Used by 3/6 decks (50%)
+1 Fallaji Archaeologist - Used by 3/6 decks (50%)
+1 Grief - Used by 3/6 decks (50%)
+1 Orcish Bowmasters - Used by 3/6 decks (50%)
+1 Griselbrand - Used by 2/6 decks (33%)
+//----------------------------------------------------------------------
+// OTHER SPELLS - 44 cards
+//----------------------------------------------------------------------
+1 Animate Dead - Used by 6/6 decks (100%)
+1 Balance - Used by 6/6 decks (100%)
+1 Careful Study - Used by 6/6 decks (100%)
+1 Collective Brutality - Used by 6/6 decks (100%)
+1 Dance of the Dead - Used by 6/6 decks (100%)
+1 Daze - Used by 6/6 decks (100%)
+1 Demonic Tutor - Used by 6/6 decks (100%)
+1 Exhume - Used by 6/6 decks (100%)
+1 Fatal Push - Used by 6/6 decks (100%)
+1 Flash - Used by 6/6 decks (100%)
+1 Force of Will - Used by 6/6 decks (100%)
+1 Frantic Search - Used by 6/6 decks (100%)
+1 Inquisition of Kozilek - Used by 6/6 decks (100%)
+1 Intuition - Used by 6/6 decks (100%)
+1 Necromancy - Used by 6/6 decks (100%)
+1 Persist - Used by 6/6 decks (100%)
+1 Reanimate - Used by 6/6 decks (100%)
+1 Shallow Grave - Used by 6/6 decks (100%)
+1 Swords to Plowshares - Used by 6/6 decks (100%)
+1 Tainted Indulgence - Used by 6/6 decks (100%)
+1 Tainted Pact - Used by 6/6 decks (100%)
+1 Teferi, Time Raveler - Used by 6/6 decks (100%)
+1 Thoughtseize - Used by 6/6 decks (100%)
+1 Unmarked Grave - Used by 6/6 decks (100%)
+1 Bitter Triumph - Used by 5/6 decks (83%)
+1 Brainstorm - Used by 5/6 decks (83%)
+1 Corpse Dance - Used by 5/6 decks (83%)
+1 Counterspell - Used by 5/6 decks (83%)
+1 Force Spike - Used by 5/6 decks (83%)
+1 Mental Misstep - Used by 5/6 decks (83%)
+1 Ponder - Used by 5/6 decks (83%)
+1 Tithing Blade - Used by 5/6 decks (83%)
+1 Unburial Rites - Used by 5/6 decks (83%)
+1 Currency Converter - Used by 4/6 decks (67%)
+1 Mana Tithe - Used by 4/6 decks (67%)
+1 Prismatic Ending - Used by 4/6 decks (67%)
+1 Spell Snare - Used by 4/6 decks (67%)
+1 Duress - Used by 4/6 decks (67%)
+1 Faithful Mending - Used by 4/6 decks (67%)
+1 Wash Away - Used by 4/6 decks (67%)
+1 Sevinne's Reclamation - Used by 3/6 decks (50%)
+1 Bone Shards - Used by 3/6 decks (50%)
+1 Buried Alive - Used by 3/6 decks (50%)
+1 Dihada's Ploy - Used by 3/6 decks (50%)
+//----------------------------------------------------------------------
+// SIDEBOARD - 1 cards
+//----------------------------------------------------------------------
+1 Aminatou, the Fateshifter - Used by 6/6 decks (100%)
+//----------------------------------------------------------------------
+// MAYBEBOARD - 40 cards
+//----------------------------------------------------------------------
+1 Oath of Kaya - Used by 2/6 decks (33%)
+1 Show and Tell - Used by 2/6 decks (33%)
+1 Clearwater Pathway - Used by 2/6 decks (33%)
+1 Concealed Courtyard - Used by 2/6 decks (33%)
+1 Urborg, Tomb of Yawgmoth - Used by 2/6 decks (33%)
+1 Spell Pierce - Used by 2/6 decks (33%)
+1 Malcolm, Alluring Scoundrel - Used by 1/6 decks (17%)
+1 Triumph of Saint Katherine - Used by 1/6 decks (17%)
+1 Temporal Mastery - Used by 1/6 decks (17%)
+1 Snow-Covered Plains - Used by 1/6 decks (17%)
+1 Beza, the Bounding Spring - Used by 1/6 decks (17%)
+1 Grave Titan - Used by 1/6 decks (17%)
+1 Sun Titan - Used by 1/6 decks (17%)
+1 Force of Negation - Used by 1/6 decks (17%)
+1 Elesh Norn, Grand Cenobite - Used by 1/6 decks (17%)
+1 Harvester of Misery - Used by 1/6 decks (17%)
+1 Three Steps Ahead - Used by 1/6 decks (17%)
+1 Eiganjo, Seat of the Empire - Used by 1/6 decks (17%)
+1 Fetid Heath - Used by 1/6 decks (17%)
+1 Hengegate Pathway - Used by 1/6 decks (17%)
+1 Mystic Gate - Used by 1/6 decks (17%)
+1 Sunken Ruins - Used by 1/6 decks (17%)
+1 Baleful Strix - Used by 1/6 decks (17%)
+1 Valgavoth, Terror Eater - Used by 1/6 decks (17%)
+1 Enlightened Tutor - Used by 1/6 decks (17%)
+1 Jace, Wielder of Mysteries - Used by 1/6 decks (17%)
+1 Liliana of the Veil - Used by 1/6 decks (17%)
+1 Port of Karfell - Used by 1/6 decks (17%)
+1 River of Tears - Used by 1/6 decks (17%)
+1 Shipwreck Marsh - Used by 1/6 decks (17%)
+1 Crabomination - Used by 1/6 decks (17%)
+1 Brainsurge - Used by 1/6 decks (17%)
+1 Consider - Used by 1/6 decks (17%)
+1 Lim-Dûl's Vault - Used by 1/6 decks (17%)
+1 Mana Leak - Used by 1/6 decks (17%)
+1 Omen of the Sea - Used by 1/6 decks (17%)
+1 Profane Tutor - Used by 1/6 decks (17%)
+1 Ripples of Undeath - Used by 1/6 decks (17%)
+1 Serum Visions - Used by 1/6 decks (17%)
+1 Wrath of the Skies - Used by 1/6 decks (17%)
 ```

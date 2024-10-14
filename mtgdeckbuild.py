@@ -199,8 +199,8 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
             print(f'// {section.upper()} - {nb_cards_section} cards')
             print('//----------------------------------------------------------------------')
             for card in sorted_section:
-                print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{total_decks} decks')
-        
+                print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{total_decks} decks ({int(round(card[1][1]/total_decks, 2)*100)}%)')
+ 
         # Sideboard
         sorted_side = sorted(avg_deck['side'].items(), key=lambda x: x[1], reverse=True)
         nb_cards_side = 0
@@ -210,7 +210,7 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
         print(f'// SIDEBOARD - {nb_cards_side} cards')
         print('//----------------------------------------------------------------------')
         for card in sorted_side:
-            print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{total_decks} decks')
+            print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{total_decks} decks ({int(round(card[1][1]/total_decks, 2)*100)}%)')
        
         if maybeboard:
             # Maybeboard
@@ -219,7 +219,7 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
                 print(f'// MAYBEBOARD - {len(avg_deck['maybeboard'])} cards')
                 print('//----------------------------------------------------------------------')
                 for card in avg_deck['maybeboard']:
-                    print(f'{avg_deck['maybeboard'][card][0]} {card} - Used by {avg_deck['maybeboard'][card][1]}/{total_decks} decks')
+                    print(f'{avg_deck['maybeboard'][card][0]} {card} - Used by {avg_deck['maybeboard'][card][1]}/{total_decks} decks ({int(round(avg_deck['maybeboard'][card][1]/total_decks, 2)*100)}%)')
 
     else:
         # Main deck
@@ -448,6 +448,13 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
+        '--since', '-S',
+        type = str,
+        action='store',
+        help = 'Only consider decks since the given start date (DD-MM-YYYY)'
+    )
+
+    parser.add_argument(
         '--top-quantity', '-T',
         action = 'store_true',
         default = False,
@@ -526,11 +533,28 @@ if __name__ == '__main__':
         exit()
 
     last_months = args['last_months']
+    since_date = args['since']
+
+    if (last_months and since_date):
+        print('argument --last-months/-l: cannot be used along with --since/-S')
+        exit()
+
     if last_months and (last_months < 1):
         print('argument --last-months/-l: must be a positive number')
         exit()
     elif last_months:
         max_number_decks = 10000000
+  
+    if since_date:
+        try:
+            start_date = datetime.strptime(since_date, '%d-%m-%Y')
+        except Exception:
+            print('argument --since/-S: date format must be DD-MM-YYYY')
+            exit()
+        if start_date > datetime.now():
+            print('argument --since/-S: date must be in the past')
+            exit()   
+        start_date_enc = start_date.strftime('%d-%m-%Y').replace('-', '%2F')
 
     top_method = args['top_quantity']
     balance = args['maybeboard']
@@ -573,9 +597,12 @@ if __name__ == '__main__':
                 if side_include:
                     deck_search_str += '&SB_check=1'
                 deck_search_str += f'&cards={quote(included_cards)}'
-            if last_months:
-                date_str = (datetime.now()-timedelta(days=30*last_months)).strftime('%d/%m/%Y').replace('/', '%2F')
-                deck_search_str += f'&date_start={date_str}'
+            if last_months or since_date:
+                if last_months:
+                    date_str = (datetime.now()-timedelta(days=30*last_months)).strftime('%d/%m/%Y').replace('/', '%2F')
+                    deck_search_str += f'&date_start={date_str}'
+                elif since_date:
+                    deck_search_str += f'&date_start={start_date_enc}'
             response = post(f'{mtgtop8_base_url}/search', data=deck_search_str, headers={'referer': f'{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})
             compare_str = 'checkall=1'
 
