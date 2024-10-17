@@ -571,7 +571,8 @@ if __name__ == '__main__':
             print('argument --since/-S: date must be in the past')
             exit()   
         start_date_enc = start_date.strftime('%d-%m-%Y').replace('-', '%2F')
-
+        max_number_decks = 10000000
+        
     top_method = args['top_quantity']
     balance = args['maybeboard']
     maybeboard = args['maybeboard']
