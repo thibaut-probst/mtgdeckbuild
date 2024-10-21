@@ -690,65 +690,53 @@ Did you mean Gruul Aggro? [y/n] (y):
 3 Pawpatch Formation
 1 Scorching Shot
 ```
-Standard Gruul Aggro average deck considering only the last 15 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing:
+Standard Gruul Aggro average deck considering only the last 50 decks with maybeboard, balance of the deck section, top quantity for each card and detailed printing:
 ```
-$ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 15 -M -T -b -p
+$ python3 mtgdeckbuild.py -f ST -a "Gruul Aggro" -d 50 -M -T -b -p
 
 
 //----------------------------------------------------------------------
-// LANDS - 20 cards
+// LANDS - 21 cards
 //----------------------------------------------------------------------
-8 Mountain - Used by 15/15 decks
-4 Copperline Gorge - Used by 15/15 decks
-4 Karplusan Forest - Used by 15/15 decks
-4 Thornspire Verge - Used by 14/15 decks
+6 Mountain - Used by 50/50 decks (100%)
+4 Copperline Gorge - Used by 50/50 decks (100%)
+4 Karplusan Forest - Used by 50/50 decks (100%)
+4 Thornspire Verge - Used by 48/50 decks (96%)
+2 Restless Ridgeline - Used by 30/50 decks (60%)
+1 Rockface Village - Used by 27/50 decks (54%)
 //----------------------------------------------------------------------
-// CREATURES - 20 cards
+// CREATURES - 21 cards
 //----------------------------------------------------------------------
-4 Emberheart Challenger - Used by 13/15 decks
-4 Heartfire Hero - Used by 13/15 decks
-4 Monastery Swiftspear - Used by 13/15 decks
-4 Cacophony Scamp - Used by 9/15 decks
-3 Picnic Ruiner - Used by 8/15 decks
-1 Slickshot Show-Off - Used by 5/15 decks
+4 Emberheart Challenger - Used by 45/50 decks (90%)
+4 Monastery Swiftspear - Used by 45/50 decks (90%)
+4 Heartfire Hero - Used by 44/50 decks (88%)
+4 Slickshot Show-Off - Used by 38/50 decks (76%)
+4 Manifold Mouse - Used by 32/50 decks (64%)
+1 Questing Druid - Used by 27/50 decks (54%)
 //----------------------------------------------------------------------
-// OTHER SPELLS - 20 cards
+// OTHER SPELLS - 18 cards
 //----------------------------------------------------------------------
-4 Monstrous Rage - Used by 13/15 decks
-4 Might of the Meek - Used by 12/15 decks
-4 Turn Inside Out - Used by 11/15 decks
-4 Leyline of Resonance - Used by 9/15 decks
-2 Snakeskin Veil - Used by 13/15 decks
-2 Witch's Mark - Used by 8/15 decks
+4 Monstrous Rage - Used by 45/50 decks (90%)
+4 Might of the Meek - Used by 38/50 decks (76%)
+4 Shock - Used by 28/50 decks (56%)
+3 Innkeeper's Talent - Used by 27/50 decks (54%)
+2 Snakeskin Veil - Used by 40/50 decks (80%)
+1 Turn Inside Out - Used by 23/50 decks (46%)
 //----------------------------------------------------------------------
 // SIDEBOARD - 15 cards
 //----------------------------------------------------------------------
-4 Torch the Tower - Used by 12/15 decks
-3 Urabrask's Forge - Used by 13/15 decks
-3 Pawpatch Formation - Used by 12/15 decks
-3 Obliterating Bolt - Used by 12/15 decks
-2 Twisted Fealty - Used by 5/15 decks
+4 Torch the Tower - Used by 40/50 decks (80%)
+3 Urabrask's Forge - Used by 47/50 decks (94%)
+2 Pawpatch Formation - Used by 38/50 decks (76%)
+2 Scorching Shot - Used by 29/50 decks (57%)
+2 Pick Your Poison - Used by 28/50 decks (56%)
+1 Obliterating Bolt - Used by 37/50 decks (74%)
+1 Ghost Vacuum - Used by 24/50 decks (48%)
 //----------------------------------------------------------------------
-// MAYBEBOARD - 18 cards
+// MAYBEBOARD - 8 cards
 //----------------------------------------------------------------------
-4 Shock - Used by 5/15 decks
-1 Restless Ridgeline - Used by 4/15 decks
-4 Manifold Mouse - Used by 4/15 decks
-2 Questing Druid - Used by 3/15 decks
-1 Forest - Used by 3/15 decks
-2 Rockface Village - Used by 3/15 decks
-4 Innkeeper's Talent - Used by 3/15 decks
-2 Audacity - Used by 2/15 decks
-2 Callous Sell-Sword - Used by 2/15 decks
-2 Royal Treatment - Used by 2/15 decks
-1 Commercial District - Used by 2/15 decks
-4 Fear of Missing Out - Used by 2/15 decks
-4 Inti, Seneschal of the Sun - Used by 2/15 decks
-4 Omnivorous Flytrap - Used by 2/15 decks
-4 Wildfire Wickerfolk - Used by 2/15 decks
-4 Break Out - Used by 2/15 decks
-4 Torch the Tower - Used by 2/15 decks
-1 Witchstalker Frenzy - Used by 2/15 decks
+4 Cacophony Scamp - Used by 18/50 decks (36%)
+4 Leyline of Resonance - Used by 17/50 decks (34%)
 ```
 Duel-Commander Aminatou, The Fateshifter average deck considering decks since a specific date, including a specific card in the main deck, with maybeboard, balance of the deck section and detailed printing:
 ```

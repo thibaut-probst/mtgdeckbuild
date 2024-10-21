@@ -215,11 +215,15 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
         if maybeboard:
             # Maybeboard
             if 'maybeboard' in avg_deck:
+                sorted_maybe = sorted(avg_deck['maybeboard'].items(), key=lambda x: x[1], reverse=True)
+                nb_cards_maybe = 0
+                for card in sorted_maybe:
+                    nb_cards_maybe += card[1][0]
                 print('//----------------------------------------------------------------------')
-                print(f'// MAYBEBOARD - {len(avg_deck['maybeboard'])} cards')
+                print(f'// MAYBEBOARD - {nb_cards_maybe} cards')
                 print('//----------------------------------------------------------------------')
-                for card in avg_deck['maybeboard']:
-                    print(f'{avg_deck['maybeboard'][card][0]} {card} - Used by {avg_deck['maybeboard'][card][1]}/{total_decks} decks ({int(round(avg_deck['maybeboard'][card][1]/total_decks, 2)*100)}%)')
+                for card in sorted_maybe:
+                    print(f'{card[1][0]} {card[0]} - Used by {card[1][1]}/{total_decks} decks ({int(round(card[1][1]/total_decks, 2)*100)}%)')
 
     else:
         # Main deck
