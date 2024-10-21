@@ -247,8 +247,8 @@ def print_avg_deck(avg_deck, total_decks, print_with_details, maybeboard):
             # Maybeboard
             if 'maybeboard' in avg_deck:
                 print('// MAYBEBOARD')
-                for card in avg_deck['maybeboard']:
-                    print(f'{avg_deck['maybeboard'][card][0]} {card}')
+                for card, info in avg_deck['maybeboard'].items():
+                    print(f'{info[0]} {card}')
 
 
 
