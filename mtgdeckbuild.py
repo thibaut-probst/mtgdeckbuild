@@ -139,9 +139,8 @@ def find_archetype(mtg_format, archetype_name):
 
     # Archetypes discovery
     archetypes = {}
-
     if mtg_format == 'EDH':
-        response = get(f'{mtgtop8_base_url}/cEDH_decks?format?f={mtg_format}&meta=121', headers=user_agent)
+        response = get(f'{mtgtop8_base_url}/cEDH_decks?format?f={mtg_format}&meta=209', headers=user_agent)
     else:
         response = get(f'{mtgtop8_base_url}/format?f={mtg_format}', headers=user_agent)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -156,7 +155,6 @@ def find_archetype(mtg_format, archetype_name):
                 archetypes[txt.lower()] = href.split('archetype?a=')[1].split('&')[0]
 
     archetype_name_lower = archetype_name.lower()
-
     # Try to find archetype with Leveinshtein distance or if provided archetype string is the start of a known one
     if archetype_name_lower not in archetypes:
         print(f'Archetype not found: {archetype_name}')
