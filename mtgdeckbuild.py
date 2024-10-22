@@ -5,7 +5,7 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from re import compile, match
-from Levenshtein import distance as lev
+from rapidfuzz import distance as lev
 
 mtgtop8_base_url = 'https://mtgtop8.com'
 user_agent = {'User-agent': 'Mozilla/5.0'}
@@ -162,7 +162,7 @@ def find_archetype(mtg_format, archetype_name):
         print(f'Archetype not found: {archetype_name}')
         for a in archetypes:
             a_lower = a.lower()
-            dist = lev(archetype_name_lower, a)
+            dist = lev.Levenshtein.distance(archetype_name_lower, a)
             if (dist <= 3) or (a_lower.startswith(archetype_name_lower) and (len(archetype_name_lower) >= 5)):
                 answer = Prompt.ask(f'Did you mean {a.title()}?', choices=['y', 'n'], default='y')
                 if answer.lower() == 'y':
@@ -567,6 +567,7 @@ if __name__ == '__main__':
   
     if since_date:
         try:
+            since_date = since_date.replace('/', '-')
             start_date = datetime.strptime(since_date, '%d-%m-%Y')
         except Exception:
             print('argument --since/-S: date format must be DD-MM-YYYY')
