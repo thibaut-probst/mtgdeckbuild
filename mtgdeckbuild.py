@@ -338,11 +338,12 @@ def build_avg_deck(sorted_main_card_counts, sorted_side_card_counts, main_target
 
             n += 1
 
+        n = 0
         # Maybeboard
         if n < len(sorted_main_card_counts):
             nb_decks_min = nb_decks
             nb_decks_next = sorted_main_card_counts[n][1][0]
-            while ( (nb_decks_next == nb_decks_min) or (nb_decks_next >= (nb_decks_min-round(nb_analyzed_decks/5))) ):
+            while ( (nb_decks_next == nb_decks_min) or (nb_decks_next >= (nb_decks_min-round(nb_analyzed_decks/4))) ):
                 card_count = sorted_main_card_counts[n]
                 card = card_count[0]
                 nb_decks = card_count[1][0]
@@ -413,7 +414,7 @@ if __name__ == '__main__':
         '--decks', '-d',
         type = int,
         action = 'store',
-        default = 20,
+        default = 25,
         help = 'The maximum number of decks to analyze (default: 25)'
     )
 
@@ -490,7 +491,7 @@ if __name__ == '__main__':
         '--maybeboard', '-M',
         action = 'store_true',
         default = False,
-        help = 'Print Maybeboard (additional cards that are tied or minus one in terms of number of decks using them)'
+        help = 'Print Maybeboard (additional cards that are tied or minus a number (analyzed decks / 4) in terms of number of decks using them for main deck and sideboard)'
     )
 
     args = vars(parser.parse_args())
