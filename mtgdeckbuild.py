@@ -484,7 +484,14 @@ if __name__ == '__main__':
         '--balance', '-b',
         action = 'store_true',
         default = False,
-        help = 'Balance the number of cards for each section (lands, creatures, other spells) based on the average number of cards per section in then analyzed decks (default: do not balance and just retain the most used cards)'
+        help = 'Balance the number of cards for each section (lands, creatures, other spells) based on the average number of cards per section in the analyzed decks (default: do not balance and just retain the most used cards)'
+    )
+
+    parser.add_argument(
+        '--balance-lands', '-B',
+        action = 'store_true',
+        default = False,
+        help = 'Balance the number of cards for the lands section based on the average number of lands in the analyzed decks (default: do not balance and just retain the most used cards)'
     )
 
     parser.add_argument(
@@ -578,7 +585,11 @@ if __name__ == '__main__':
         max_number_decks = 10000000
         
     top_method = args['top_quantity']
-    balance = args['maybeboard']
+    balance = args['balance']
+    balance_lands = args['balance_lands']
+    if balance and balance_lands:
+        print('argument --balance/-b: cannot be used along with --balance-lands/-B')
+        exit() 
     maybeboard = args['maybeboard']
 
     if not mtg_format:
@@ -795,6 +806,8 @@ if __name__ == '__main__':
     # avg number of lands, creatures and other spells
     if balance:
         section_avg = {'lands':0, 'creatures':0, 'other spells': 0} # option chosen
+    elif balance_lands:
+        section_avg = {'lands':0, 'creatures':1000, 'other spells': 1000} # option chosen only for lands
     else:
         section_avg = {'lands':1000, 'creatures':1000, 'other spells': 1000} # option not chosen then set no limits
 
@@ -824,6 +837,9 @@ if __name__ == '__main__':
             # Compute average number of cards per section to have these as targets if option is chosen
             if balance:
                 section_avg[section] += quantity
+            elif balance_lands:
+                if section == 'lands':
+                    section_avg[section] += quantity
 
         side_cards = decks[deck]['side']
         for card in side_cards:
@@ -851,6 +867,8 @@ if __name__ == '__main__':
     if balance:
         for section, avg in section_avg.items():
             section_avg[section] = round(avg / len(decks))
+    elif balance_lands:
+        section_avg['lands'] = round(section_avg['lands'] / len(decks))
 
     # For EDH and cEDH format, adapt target number of cards in deck
     if ('EDH' in mtg_format) or ('Commander' in mtg_format):
