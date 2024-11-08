@@ -140,7 +140,7 @@ def find_archetype(mtg_format, archetype_name):
     # Archetypes discovery
     archetypes = {}
     if mtg_format == 'EDH':
-        response = get(f'{mtgtop8_base_url}/cEDH_decks?format?f={mtg_format}', headers=user_agent)
+        response = get(f'{mtgtop8_base_url}/cEDH_decks?f=EDH&show=pop&cid=&meta=283&cEDH_cp=1', headers=user_agent)
     else:
         response = get(f'{mtgtop8_base_url}/format?f={mtg_format}', headers=user_agent)
     soup = BeautifulSoup(response.text, 'html.parser')
