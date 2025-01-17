@@ -666,7 +666,7 @@ if __name__ == '__main__':
 
             # Deck comparison
             deck_section = ''
-            card_count_regex = compile('<div class="c">([0-9]{0,2})</div>')
+            card_count_regex = compile('<div class="ctris">([0-9]{0,2})</div>')
             
             # Deck comparison to get all the cards
             response = post(f'{mtgtop8_base_url}/compare', data = compare_str, headers={'referer': '{mtgtop8_base_url}/search', 'Content-Type': 'application/x-www-form-urlencoded'})   
